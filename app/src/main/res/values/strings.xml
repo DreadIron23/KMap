@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">Karnaugh Map</string>
+    <string name="title_activity_list_od_projects">Zoznam projektov</string>
+</resources>
