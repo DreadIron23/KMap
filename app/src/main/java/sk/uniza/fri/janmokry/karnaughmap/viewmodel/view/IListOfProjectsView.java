@@ -5,4 +5,6 @@ import java.util.List;
 public interface IListOfProjectsView extends IProjectView {
 
     void setData(List<String> customers);
+
+    void deleteProject(String projectName);
 }

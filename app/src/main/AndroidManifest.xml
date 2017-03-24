@@ -18,6 +18,17 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name=".activity.AdjustProjectActivity"
+            android:label="@string/title_activity_adjust_project"
+            android:parentActivityName=".activity.ListOfProjectsActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="adjustPan">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="sk.uniza.fri.janmokry.karnaughmap.activity.ListOfProjectsActivity" />
+        </activity>
+
     </application>
 
 </manifest>

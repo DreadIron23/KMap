@@ -1,4 +1,18 @@
 <resources>
     <string name="app_name">Karnaugh Map</string>
     <string name="title_activity_list_od_projects">Zoznam projektov</string>
+    <string name="title_activity_adjust_project">Nový projekt</string>
+    <string name="title_activity_adjust_project_edit_mode">Editovať projekt</string>
+    <string name="adjust_project_hint">Text názvu</string>
+    <string name="adjust_project_label">Názov projektu</string>
+    <string name="adjust_project_error_no_name">Názov projektu je prázdny!</string>
+    <string name="adjust_project_screen_delete_dialog_title">Zmazať zmeny</string>
+    <string name="adjust_project_screen_delete_dialog_message">Ste si istý, že chcete zmazať zmeny?</string>
+    <string name="adjust_project_screen_delete_dialog_logout">zmazať</string>
+    <string name="adjust_project_screen_delete_dialog_discard">zrušiť</string>
+    <string name="adjust_project_error_already_used_name">Projekt s týmto názvom už existuje</string>
+    <string name="list_of_projects_screen_delete_dialog_title">Vymazať projekt</string>
+    <string name="list_of_projects_screen_delete_dialog_message">Ste si istý, že chcete svoj projekt vymazať?</string>
+    <string name="list_of_projects_screen_delete_dialog_logout">vymazať</string>
+    <string name="list_of_projects_screen_delete_dialog_discard">zrušiť</string>
 </resources>

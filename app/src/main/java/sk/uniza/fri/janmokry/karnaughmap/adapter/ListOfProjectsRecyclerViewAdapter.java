@@ -33,38 +33,53 @@ public class ListOfProjectsRecyclerViewAdapter extends RecyclerView.Adapter<Recy
         @BindView(R.id.bin)
         protected ImageView mBin;
 
-        private OnProjectClickedListener mListener;
+        private OnClickListener mListener;
 
         public ViewHolder(View itemView) {
             super(itemView);
 
             ButterKnife.bind(this, itemView);
         }
-    }
 
-    public interface OnProjectClickedListener {
+    }
+    public interface OnClickListener {
 
         void onProjectClicked(String projectName);
+
+        void onEditClicked(String projectName);
+
+        void onBinClicked(String projectName);
+
     }
 
     private Context mContext;
-    private OnProjectClickedListener mOnProjectClickedListener;
+
+    private OnClickListener mOnClickListener;
     private List<String> mItems = new ArrayList<>();
-
-
-    public ListOfProjectsRecyclerViewAdapter(Context context, OnProjectClickedListener listener) {
+    public ListOfProjectsRecyclerViewAdapter(Context context, OnClickListener onClickListener) {
         mContext = context;
-        mOnProjectClickedListener = listener;
+        mOnClickListener = onClickListener;
     }
+
 
     public void add(String projectName) {
         mItems.add(projectName);
         notifyDataSetChanged();
     }
 
+    public void delete(String projectName) {
+        final int indexOfRemovedItem = mItems.indexOf(projectName);
+        mItems.remove(projectName);
+        notifyItemRemoved(indexOfRemovedItem);
+    }
+
     public void addAll(Collection<String> projectNames) {
         mItems.addAll(projectNames);
         notifyDataSetChanged();
+    }
+
+    public void clear() {
+        mItems.clear();
     }
 
     @Override
@@ -78,13 +93,30 @@ public class ListOfProjectsRecyclerViewAdapter extends RecyclerView.Adapter<Recy
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         final ViewHolder castedHolder = (ViewHolder) holder;
         castedHolder.mName.setText(mItems.get(position));
-        castedHolder.mListener = mOnProjectClickedListener;
+        castedHolder.mListener = mOnClickListener;
         castedHolder.mBaseLayout.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
-                mOnProjectClickedListener.onProjectClicked(castedHolder.mName.getText() + "");
+                mOnClickListener.onProjectClicked(castedHolder.mName.getText().toString());
             }
+
+        });
+        castedHolder.mEdit.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                mOnClickListener.onEditClicked(castedHolder.mName.getText().toString());
+            }
+
+        });
+        castedHolder.mBin.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                mOnClickListener.onBinClicked(castedHolder.mName.getText().toString());
+            }
+
         });
     }
 

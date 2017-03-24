@@ -4,10 +4,14 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.squareup.otto.Subscribe;
+
 import java.util.ArrayList;
 import java.util.List;
 
+import sk.uniza.fri.janmokry.karnaughmap.data.EventBusService;
 import sk.uniza.fri.janmokry.karnaughmap.data.ListOfProjectsPreferences;
+import sk.uniza.fri.janmokry.karnaughmap.data.event.RefreshListOfProjectsContentEvent;
 import sk.uniza.fri.janmokry.karnaughmap.util.SL;
 import sk.uniza.fri.janmokry.karnaughmap.viewmodel.view.IListOfProjectsView;
 
@@ -23,7 +27,15 @@ public class ListOfProjectsViewModel extends ProjectBaseViewModel<IListOfProject
     public void onCreate(Bundle arguments, @Nullable Bundle savedInstanceState) {
         super.onCreate(arguments, savedInstanceState);
 
+        SL.get(EventBusService.class).register(this);
         initProjectNames();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+        SL.get(EventBusService.class).unregister(this);
     }
 
     @Override
@@ -32,6 +44,24 @@ public class ListOfProjectsViewModel extends ProjectBaseViewModel<IListOfProject
 
         if(mProjectNames != null) {
             setDataToView();
+        }
+    }
+
+    @Subscribe
+    public void onRefreshListOfProjectsContentPosted(RefreshListOfProjectsContentEvent event) {
+        initProjectNames();
+        setDataToView();
+    }
+
+    public void deleteProject(String projectName) {
+        SL.get(ListOfProjectsPreferences.class).removeProjectName(projectName);
+        initProjectNames();
+        deleteFromView(projectName);
+    }
+
+    private void deleteFromView(String projectName) {
+        if (getView() != null) {
+            getView().deleteProject(projectName);
         }
     }
 
@@ -44,7 +74,5 @@ public class ListOfProjectsViewModel extends ProjectBaseViewModel<IListOfProject
 
     private void initProjectNames() {
         mProjectNames = new ArrayList<>(SL.get(ListOfProjectsPreferences.class).getProjectNames());
-        mProjectNames.add("Prevodník BCD + 3"); // TODO test data
-        mProjectNames.add("Sedem segmentovka"); // TODO test data
     }
 }
