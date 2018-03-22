@@ -6,11 +6,11 @@ import android.support.annotation.Nullable;
 
 import com.squareup.otto.Subscribe;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import sk.uniza.fri.janmokry.karnaughmap.data.EventBusService;
-import sk.uniza.fri.janmokry.karnaughmap.data.ListOfProjectsPreferences;
+import sk.uniza.fri.janmokry.karnaughmap.data.ProjectInfo;
+import sk.uniza.fri.janmokry.karnaughmap.data.ProjectInfoManager;
 import sk.uniza.fri.janmokry.karnaughmap.data.event.RefreshListOfProjectsContentEvent;
 import sk.uniza.fri.janmokry.karnaughmap.util.SL;
 import sk.uniza.fri.janmokry.karnaughmap.viewmodel.view.IListOfProjectsView;
@@ -21,7 +21,7 @@ import sk.uniza.fri.janmokry.karnaughmap.viewmodel.view.IListOfProjectsView;
 public class ListOfProjectsViewModel extends ProjectBaseViewModel<IListOfProjectsView> {
 
     @Nullable
-    private List<String> mProjectNames;
+    private List<ProjectInfo> mProjectInfos;
 
     @Override
     public void onCreate(Bundle arguments, @Nullable Bundle savedInstanceState) {
@@ -42,7 +42,7 @@ public class ListOfProjectsViewModel extends ProjectBaseViewModel<IListOfProject
     public void onBindView(@NonNull IListOfProjectsView view) {
         super.onBindView(view);
 
-        if(mProjectNames != null) {
+        if(mProjectInfos != null) {
             setDataToView();
         }
     }
@@ -53,26 +53,29 @@ public class ListOfProjectsViewModel extends ProjectBaseViewModel<IListOfProject
         setDataToView();
     }
 
-    public void deleteProject(String projectName) {
-        SL.get(ListOfProjectsPreferences.class).removeProjectName(projectName);
-        initProjectNames();
-        deleteFromView(projectName);
+    public void deleteProject(ProjectInfo projectInfo) {
+        SL.get(ProjectInfoManager.class).delete(projectInfo, () -> {
+            deleteFromView(projectInfo);
+        } );
     }
 
-    private void deleteFromView(String projectName) {
+    private void deleteFromView(ProjectInfo projectInfo) {
         if (getView() != null) {
-            getView().deleteProject(projectName);
+            getView().deleteProject(projectInfo);
         }
     }
 
     private void setDataToView() {
         final IListOfProjectsView view = getView();
         if (view != null) {
-            view.setData(mProjectNames);
+            view.setData(mProjectInfos);
         }
     }
 
     private void initProjectNames() {
-        mProjectNames = new ArrayList<>(SL.get(ListOfProjectsPreferences.class).getProjectNames());
+        SL.get(ProjectInfoManager.class).getAllAsync(projectInfos -> {
+            mProjectInfos = projectInfos;
+            setDataToView();
+        });
     }
 }

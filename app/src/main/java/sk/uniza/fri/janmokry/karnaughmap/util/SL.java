@@ -7,6 +7,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * Service Locator.
+ *
  * Class for handling service instances.
  */
 public class SL {

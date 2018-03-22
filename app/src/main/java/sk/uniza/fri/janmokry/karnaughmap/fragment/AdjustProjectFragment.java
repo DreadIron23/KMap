@@ -1,5 +1,6 @@
 package sk.uniza.fri.janmokry.karnaughmap.fragment;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.widget.EditText;
@@ -7,29 +8,25 @@ import android.widget.EditText;
 import butterknife.BindView;
 import butterknife.OnClick;
 import sk.uniza.fri.janmokry.karnaughmap.R;
+import sk.uniza.fri.janmokry.karnaughmap.activity.ProjectActivity;
+import sk.uniza.fri.janmokry.karnaughmap.data.ProjectInfo;
 import sk.uniza.fri.janmokry.karnaughmap.viewmodel.AdjustProjectViewModel;
 import sk.uniza.fri.janmokry.karnaughmap.viewmodel.view.IAdjustProjectView;
 
-import static sk.uniza.fri.janmokry.karnaughmap.activity.AdjustProjectActivity.ARG_OLD_PROJECT_NAME;
+import static sk.uniza.fri.janmokry.karnaughmap.activity.AdjustProjectActivity.ARG_EDITING_PROJECT_INFO;
 
 public class AdjustProjectFragment extends ProjectBaseFragment<IAdjustProjectView, AdjustProjectViewModel> implements IAdjustProjectView {
 
-    public static AdjustProjectFragment newInstance(@Nullable String oldProjectName) {
+    public static AdjustProjectFragment newInstance(@Nullable ProjectInfo editingProjectInfo) {
         final AdjustProjectFragment fragment = new AdjustProjectFragment();
         final Bundle args = new Bundle();
-        args.putString(ARG_OLD_PROJECT_NAME, oldProjectName);
+        args.putSerializable(ARG_EDITING_PROJECT_INFO, editingProjectInfo);
         fragment.setArguments(args);
         return fragment;
     }
 
     @BindView(R.id.project_name)
     protected EditText mProjectName;
-
-    @Nullable
-    @Override
-    public Class<AdjustProjectViewModel> getViewModelClass() {
-        return AdjustProjectViewModel.class;
-    }
 
     @Override
     protected int getLayoutResId() {
@@ -70,6 +67,12 @@ public class AdjustProjectFragment extends ProjectBaseFragment<IAdjustProjectVie
     @Override
     public void setName(String projectName) {
         mProjectName.setText(projectName);
+    }
+
+    @Override
+    public void launchProjectActivity(ProjectInfo projectInfo) {
+        final Intent intent = ProjectActivity.newIntent(getContext(), projectInfo);
+        startActivity(intent);
     }
 
     private boolean isMessageEmpty() {

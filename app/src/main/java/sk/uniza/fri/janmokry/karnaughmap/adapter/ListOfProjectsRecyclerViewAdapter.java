@@ -16,6 +16,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import sk.uniza.fri.janmokry.karnaughmap.R;
+import sk.uniza.fri.janmokry.karnaughmap.data.ProjectInfo;
 
 public class ListOfProjectsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
@@ -33,8 +34,6 @@ public class ListOfProjectsRecyclerViewAdapter extends RecyclerView.Adapter<Recy
         @BindView(R.id.bin)
         protected ImageView mBin;
 
-        private OnClickListener mListener;
-
         public ViewHolder(View itemView) {
             super(itemView);
 
@@ -42,38 +41,39 @@ public class ListOfProjectsRecyclerViewAdapter extends RecyclerView.Adapter<Recy
         }
 
     }
+
     public interface OnClickListener {
 
-        void onProjectClicked(String projectName);
+        void onProjectClicked(ProjectInfo projectInfo);
 
-        void onEditClicked(String projectName);
+        void onEditClicked(ProjectInfo projectInfo);
 
-        void onBinClicked(String projectName);
+        void onBinClicked(ProjectInfo projectInfo);
 
     }
 
     private Context mContext;
 
     private OnClickListener mOnClickListener;
-    private List<String> mItems = new ArrayList<>();
+    private List<ProjectInfo> mItems = new ArrayList<>();
     public ListOfProjectsRecyclerViewAdapter(Context context, OnClickListener onClickListener) {
         mContext = context;
         mOnClickListener = onClickListener;
     }
 
 
-    public void add(String projectName) {
-        mItems.add(projectName);
+    public void add(ProjectInfo projectInfo) {
+        mItems.add(projectInfo);
         notifyDataSetChanged();
     }
 
-    public void delete(String projectName) {
-        final int indexOfRemovedItem = mItems.indexOf(projectName);
-        mItems.remove(projectName);
+    public void delete(ProjectInfo projectInfo) {
+        final int indexOfRemovedItem = mItems.indexOf(projectInfo);
+        mItems.remove(projectInfo);
         notifyItemRemoved(indexOfRemovedItem);
     }
 
-    public void addAll(Collection<String> projectNames) {
+    public void addAll(Collection<ProjectInfo> projectNames) {
         mItems.addAll(projectNames);
         notifyDataSetChanged();
     }
@@ -92,32 +92,11 @@ public class ListOfProjectsRecyclerViewAdapter extends RecyclerView.Adapter<Recy
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         final ViewHolder castedHolder = (ViewHolder) holder;
-        castedHolder.mName.setText(mItems.get(position));
-        castedHolder.mListener = mOnClickListener;
-        castedHolder.mBaseLayout.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                mOnClickListener.onProjectClicked(castedHolder.mName.getText().toString());
-            }
-
-        });
-        castedHolder.mEdit.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                mOnClickListener.onEditClicked(castedHolder.mName.getText().toString());
-            }
-
-        });
-        castedHolder.mBin.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                mOnClickListener.onBinClicked(castedHolder.mName.getText().toString());
-            }
-
-        });
+        final ProjectInfo projectInfo = mItems.get(position);
+        castedHolder.mName.setText(projectInfo.name);
+        castedHolder.mBaseLayout.setOnClickListener(v -> mOnClickListener.onProjectClicked(projectInfo));
+        castedHolder.mEdit.setOnClickListener(v -> mOnClickListener.onEditClicked(projectInfo));
+        castedHolder.mBin.setOnClickListener(v -> mOnClickListener.onBinClicked(projectInfo));
     }
 
     @Override

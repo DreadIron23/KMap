@@ -11,6 +11,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
 import sk.uniza.fri.janmokry.karnaughmap.R;
+import sk.uniza.fri.janmokry.karnaughmap.data.ProjectInfo;
 import sk.uniza.fri.janmokry.karnaughmap.fragment.AdjustProjectFragment;
 import sk.uniza.fri.janmokry.karnaughmap.viewmodel.EmptyViewModel;
 import sk.uniza.fri.janmokry.karnaughmap.viewmodel.view.IEmptyView;
@@ -18,27 +19,22 @@ import sk.uniza.fri.janmokry.karnaughmap.viewmodel.view.IEmptyView;
 public class AdjustProjectActivity extends ProjectBaseActivity<IEmptyView, EmptyViewModel> {
 
     private static final String ADJUST_PROJECT_FRAGMENT_TAG = "adjustProjectFragmentTag";
-    public static final String ARG_OLD_PROJECT_NAME = "oldProjectName";
+    public static final String ARG_EDITING_PROJECT_INFO = "editingProjectInfo";
 
     public static Intent newIntent(Context context) {
         return new Intent(context, AdjustProjectActivity.class);
     }
 
-    public static Intent newIntentForEditing(Context context, String oldProjectName) {
+    public static Intent newIntentForEditing(Context context, ProjectInfo projectInfo) {
         final Intent intent = new Intent(context, AdjustProjectActivity.class);
-        intent.putExtra(ARG_OLD_PROJECT_NAME, oldProjectName);
+        intent.putExtra(ARG_EDITING_PROJECT_INFO, projectInfo);
         return intent;
     }
 
     @Nullable
-    private String mOldProjectName;
+    private ProjectInfo mEditingProjectInfo;
 
     private AdjustProjectFragment mAdjustProjectFragment;
-
-    @Override
-    public Class<EmptyViewModel> getViewModelClass() {
-        return EmptyViewModel.class;
-    }
 
     @Override
     protected int getLayoutResId() {
@@ -55,13 +51,13 @@ public class AdjustProjectActivity extends ProjectBaseActivity<IEmptyView, Empty
             getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_close);
         }
 
-        mOldProjectName = getIntent().getStringExtra(ARG_OLD_PROJECT_NAME);
-        if (mOldProjectName != null) {
+        mEditingProjectInfo = (ProjectInfo) getIntent().getSerializableExtra(ARG_EDITING_PROJECT_INFO);
+        if (mEditingProjectInfo != null) {
             setTitle(R.string.title_activity_adjust_project_edit_mode);
         }
 
         if (savedInstanceState == null) {
-            mAdjustProjectFragment = AdjustProjectFragment.newInstance(mOldProjectName);
+            mAdjustProjectFragment = AdjustProjectFragment.newInstance(mEditingProjectInfo);
             loadFragment(mAdjustProjectFragment, ADJUST_PROJECT_FRAGMENT_TAG);
         } else {
             mAdjustProjectFragment = (AdjustProjectFragment) getSupportFragmentManager().findFragmentByTag(ADJUST_PROJECT_FRAGMENT_TAG);
@@ -79,22 +75,39 @@ public class AdjustProjectActivity extends ProjectBaseActivity<IEmptyView, Empty
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                if (mAdjustProjectFragment.hasTextChanged()) {
-                    new AlertDialog.Builder(this, R.style.DialogStyle)
-                            .setTitle(R.string.adjust_project_screen_delete_dialog_title)
-                            .setMessage(R.string.adjust_project_screen_delete_dialog_message)
-                            .setPositiveButton(R.string.adjust_project_screen_delete_dialog_logout, new DialogInterface.OnClickListener() {
-
-                                @Override
-                                public void onClick(DialogInterface dialog, int whichButton) {
-                                    finish();
-                                }})
-                            .setNegativeButton(R.string.adjust_project_screen_delete_dialog_discard, null)
-                            .show();
+                if (arePendingChangesToBeSaved()) {
+                    showClosingConfirmationDialog();
                     return true;
                 }
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void showClosingConfirmationDialog() {
+        new AlertDialog.Builder(this, R.style.DialogStyle)
+                .setTitle(R.string.adjust_project_screen_delete_dialog_title)
+                .setMessage(R.string.adjust_project_screen_delete_dialog_message)
+                .setPositiveButton(R.string.adjust_project_screen_delete_dialog_logout, new DialogInterface.OnClickListener() {
+
+                    @Override
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        finish();
+                    }})
+                .setNegativeButton(R.string.adjust_project_screen_delete_dialog_discard, null)
+                .show();
+    }
+
+    private boolean arePendingChangesToBeSaved() {
+        return mAdjustProjectFragment.hasTextChanged();
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (arePendingChangesToBeSaved()) {
+            showClosingConfirmationDialog();
+        } else {
+            super.onBackPressed();
+        }
     }
 }

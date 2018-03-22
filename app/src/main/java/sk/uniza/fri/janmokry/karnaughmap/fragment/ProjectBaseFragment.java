@@ -2,6 +2,7 @@ package sk.uniza.fri.janmokry.karnaughmap.fragment;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.support.annotation.LayoutRes;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,7 +22,7 @@ public abstract class ProjectBaseFragment<T extends IView, R extends AbstractVie
     protected ProjectBaseActivity mActivity;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View  onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mRootView = inflater.inflate(getLayoutResId(), container, false);
         mUnbinder = ButterKnife.bind(this, mRootView);
         init();
@@ -53,6 +54,7 @@ public abstract class ProjectBaseFragment<T extends IView, R extends AbstractVie
         mActivity = null;
     }
 
+    @LayoutRes
     protected abstract int getLayoutResId();
 
     protected abstract void init();

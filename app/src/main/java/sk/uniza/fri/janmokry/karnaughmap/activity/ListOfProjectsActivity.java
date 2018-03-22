@@ -17,11 +17,6 @@ public class ListOfProjectsActivity extends ProjectBaseActivity<IEmptyView, Empt
     }
 
     @Override
-    public Class<EmptyViewModel> getViewModelClass() {
-        return EmptyViewModel.class;
-    }
-
-    @Override
     protected int getLayoutResId() {
         return R.layout.activity_list_of_projects;
     }

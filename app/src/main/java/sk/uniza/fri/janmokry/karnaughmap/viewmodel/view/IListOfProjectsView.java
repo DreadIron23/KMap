@@ -2,9 +2,11 @@ package sk.uniza.fri.janmokry.karnaughmap.viewmodel.view;
 
 import java.util.List;
 
-public interface IListOfProjectsView extends IProjectView {
+import sk.uniza.fri.janmokry.karnaughmap.data.ProjectInfo;
 
-    void setData(List<String> customers);
+public interface IListOfProjectsView extends IBaseProjectView {
 
-    void deleteProject(String projectName);
+    void setData(List<ProjectInfo> projectInfoList);
+
+    void deleteProject(ProjectInfo projectInfo);
 }

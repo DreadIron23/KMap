@@ -6,7 +6,8 @@ import android.support.annotation.Nullable;
 
 import sk.uniza.fri.janmokry.karnaughmap.activity.AdjustProjectActivity;
 import sk.uniza.fri.janmokry.karnaughmap.data.EventBusService;
-import sk.uniza.fri.janmokry.karnaughmap.data.ListOfProjectsPreferences;
+import sk.uniza.fri.janmokry.karnaughmap.data.ProjectInfo;
+import sk.uniza.fri.janmokry.karnaughmap.data.ProjectInfoManager;
 import sk.uniza.fri.janmokry.karnaughmap.data.event.RefreshListOfProjectsContentEvent;
 import sk.uniza.fri.janmokry.karnaughmap.util.SL;
 import sk.uniza.fri.janmokry.karnaughmap.viewmodel.view.IAdjustProjectView;
@@ -17,49 +18,61 @@ import sk.uniza.fri.janmokry.karnaughmap.viewmodel.view.IAdjustProjectView;
 public class AdjustProjectViewModel extends ProjectBaseViewModel<IAdjustProjectView> {
 
     @Nullable
-    private String mOldProjectName;
+    private ProjectInfo mEditingProjectInfo;
 
     @Override
     public void onCreate(Bundle arguments, @Nullable Bundle savedInstanceState) {
         super.onCreate(arguments, savedInstanceState);
 
-        mOldProjectName = arguments.getString(AdjustProjectActivity.ARG_OLD_PROJECT_NAME);
+        mEditingProjectInfo = (ProjectInfo) arguments.getSerializable(AdjustProjectActivity.ARG_EDITING_PROJECT_INFO);
     }
 
     @Override
+    @SuppressWarnings("ConstantConditions")
     public void onBindView(@NonNull IAdjustProjectView view) {
         super.onBindView(view);
 
         if (isEditMode()) {
-            view.setName(mOldProjectName);
+            view.setName(mEditingProjectInfo.name);
         }
     }
 
+    @SuppressWarnings("ConstantConditions")
     public boolean hasTextChanged(String currentText) {
-        return isEditMode() ? !currentText.equals(mOldProjectName) : !currentText.isEmpty();
+        return isEditMode() ? !currentText.equals(mEditingProjectInfo.name) : !currentText.isEmpty();
     }
 
     public void projectNameConfirmed(String newProjectName) {
-        final ListOfProjectsPreferences preferences = SL.get(ListOfProjectsPreferences.class);
+        final ProjectInfoManager projectInfoManager = SL.get(ProjectInfoManager.class);
 
-        if (preferences.isProjectNameUsed(newProjectName)) {
-            showAlreadyUsedNameError();
-            return;
+        projectInfoManager.isProjectNameUsedAsync(newProjectName, isProjectNameUsed -> {
+                    if (isProjectNameUsed) {
+                        showAlreadyUsedNameError();
+                    } else {
+                        if (isEditMode()) {
+                            projectInfoManager.updateProjectNameAsync(mEditingProjectInfo, newProjectName, () -> {
+                                        SL.get(EventBusService.class).post(new RefreshListOfProjectsContentEvent());
+                                        finishView();
+                                    });
+                        } else {
+                            projectInfoManager.insertAsync(new ProjectInfo(newProjectName), insertedId -> {
+                                        launchProjectActivity(new ProjectInfo(insertedId, newProjectName));
+                                        SL.get(EventBusService.class).post(new RefreshListOfProjectsContentEvent());
+                                        finishView();
+                                    });
+                        }
+                    }
+                });
+    }
+
+    private void launchProjectActivity(ProjectInfo projectInfo) {
+        if (getView() != null) {
+            getView().launchProjectActivity(projectInfo);
         }
-
-        if (isEditMode()) {
-            preferences.updateProjectName(mOldProjectName, newProjectName);
-        } else {
-            preferences.addProjectName(newProjectName);
-            // TODO open new project screen
-        }
-
-        SL.get(EventBusService.class).post(new RefreshListOfProjectsContentEvent());
-        finishView();
     }
 
     private boolean isEditMode() {
-        return mOldProjectName != null;
+        return mEditingProjectInfo != null;
     }
 
     private void showAlreadyUsedNameError() {
