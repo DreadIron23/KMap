@@ -2,6 +2,7 @@ package sk.uniza.fri.janmokry.karnaughmap.kmap;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 
 import sk.uniza.fri.janmokry.karnaughmap.kmap.helper.Position;
 import sk.uniza.fri.janmokry.karnaughmap.util.BitOperationUtil;
@@ -15,7 +16,7 @@ public class KMapCollection implements Serializable {
     // as for now, we support Karnaugh Map up to 8 variables, i.e. 4x4, 16x16 dimensions respectively
     private final KMapCell[][] mCells = new KMapCell[16][16]; //columns, rows
 
-    private final ArrayList<KMapCell> mList = new ArrayList<>(NUMBER_OF_CELLS);
+    private transient ArrayList<KMapCell> mList = new ArrayList<>(NUMBER_OF_CELLS);
 
     private int mNumberOfVariables;
 
@@ -56,5 +57,18 @@ public class KMapCollection implements Serializable {
 
     public boolean isValidPosition(int column, int row) {
         return column >= 0 && row >= 0 && column < getColumnSize() && row < getRowSize();
+    }
+
+    /** Call this after GSON deserialization. It restores instance to correct state */
+    public void afterGsonDeserialization() {
+        mList = new ArrayList<>();
+        for (KMapCell[] column : mCells) {
+            for (KMapCell cell : column) {
+                if (cell != null) {
+                    mList.add(cell);
+                }
+            }
+        }
+        Collections.sort(mList, (first, second) -> first.getValue() - second.getValue());
     }
 }

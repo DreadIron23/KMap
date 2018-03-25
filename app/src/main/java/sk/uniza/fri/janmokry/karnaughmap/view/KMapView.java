@@ -4,9 +4,9 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -54,26 +54,36 @@ public class KMapView extends View {
     public KMapView(Context context) {
         super(context);
 
-        init(context);
+        init(context, null);
     }
 
     public KMapView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
 
-        init(context);
+        init(context, null);
     }
 
     public KMapView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
 
-        init(context);
+        init(context, null);
     }
 
-    private void init(Context context) {
+    /**
+     * @param providedKMapCollection used for loading for now
+     */
+    private KMapView(Context context, @Nullable KMapCollection providedKMapCollection) {
+        super(context);
+
+        init(context, providedKMapCollection);
+    }
+
+    private void init(Context context, @Nullable KMapCollection providedKMapCollection) {
         mContext = context;
         final Resources resources = context.getResources();
 
-        mKMapCollection = new KMapCollection(5);
+        mKMapCollection = providedKMapCollection == null ?
+                new KMapCollection(5) : providedKMapCollection;
 
         mCellSizeInPx = GraphicsUtil.dpToPx(resources, CELL_SIZE_IN_DP);
 
@@ -91,11 +101,16 @@ public class KMapView extends View {
         mVariableTextPaint.setAntiAlias(true);
     }
 
-    public String onSave() { // TODO resolve saving mechanism
+    public String onSave() { // TODO resolve saving mechanism; check if working asi intended
         final Gson gson = SL.get(GsonService.class).provide();
-        final String serialized = gson.toJson(mKMapCollection);
-        Log.e(TAG, serialized);
-        return serialized;
+        return gson.toJson(mKMapCollection);
+    }
+
+    public static KMapView onLoad(Context context, @NonNull String savedJson) {
+        final Gson gson = SL.get(GsonService.class).provide();
+        final KMapCollection kMapCollection = gson.fromJson(savedJson, KMapCollection.class);
+        kMapCollection.afterGsonDeserialization();
+        return new KMapView(context, kMapCollection);
     }
 
     @Override
@@ -115,7 +130,6 @@ public class KMapView extends View {
                 final KMapCell actionUpCell = getCellAtPoint(x, y);
                 if (actionUpCell == mTappedCell && mTappedCell != null && isItTheSameSpot(event)) { // only flipping when tapped
                     mTappedCell.tapped();
-                    onSave(); // TODO delete
                     invalidate();
                     return true;
                 }

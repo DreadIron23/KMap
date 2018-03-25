@@ -29,6 +29,10 @@ public class KMapCell {
         changeToNextBit();
     }
 
+    public int getValue() {
+        return mValue;
+    }
+
     @Override
     public String toString() {
         switch(mBitRepresentation) {
