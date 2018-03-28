@@ -60,7 +60,7 @@ public class ListOfProjectsFragment extends ProjectBaseFragment<IListOfProjectsV
                 new AlertDialog.Builder(getContext(), R.style.DialogStyle)
                         .setTitle(R.string.list_of_projects_screen_delete_dialog_title)
                         .setMessage(R.string.list_of_projects_screen_delete_dialog_message)
-                        .setPositiveButton(R.string.list_of_projects_screen_delete_dialog_logout, (dialog, whichButton) ->
+                        .setPositiveButton(R.string.list_of_projects_screen_delete_dialog_delete, (dialog, whichButton) ->
                                 getViewModel().deleteProject(projectInfo)
                         )
                         .setNegativeButton(R.string.list_of_projects_screen_delete_dialog_discard, null)

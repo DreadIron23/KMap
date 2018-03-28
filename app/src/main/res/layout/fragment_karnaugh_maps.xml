@@ -1,17 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
-<sk.uniza.fri.janmokry.karnaughmap.view.TwoDScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_height="match_parent"
     android:layout_width="match_parent"
-    android:scrollbars="horizontal|vertical"
     tools:context=".fragment.KarnaughMapsFragment">
 
-    <LinearLayout
-        android:id="@+id/kmap_container"
+    <TextView
+        android:id="@+id/no_data_message"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:padding="16dp"
+        android:text="@string/project_screen_no_map_message" />
+
+    <sk.uniza.fri.janmokry.karnaughmap.view.TwoDScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:scrollbars="horizontal|vertical" >
 
-    </LinearLayout>
+        <LinearLayout
+            android:id="@+id/kmap_item_container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical" />
 
-</sk.uniza.fri.janmokry.karnaughmap.view.TwoDScrollView>
+    </sk.uniza.fri.janmokry.karnaughmap.view.TwoDScrollView>
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/add_kmap"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="16dp" />
+
+</FrameLayout>

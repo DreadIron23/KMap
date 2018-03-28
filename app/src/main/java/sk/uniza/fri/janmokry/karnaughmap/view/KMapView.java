@@ -30,6 +30,7 @@ public class KMapView extends View {
     public static final int[] POSITIONS_OF_3_VARIABLES = new int[] { 0x66, 0x3C, 0x0F };
     public static final int[] POSITIONS_OF_2_VARIABLES = new int[] { 0x6, 0x3 };
     public static final int[] POSITIONS_OF_1_VARIABLE = new int[] { 0x1 };
+    public static final int[] POSITIONS_OF_0_VARIABLES = new int[] {};
 
     private final static String TAG = KMapView.class.getSimpleName();
 
@@ -101,7 +102,7 @@ public class KMapView extends View {
         mVariableTextPaint.setAntiAlias(true);
     }
 
-    public String onSave() { // TODO resolve saving mechanism; check if working asi intended
+    public String onSave() { // TODO resolve saving mechanism; check if working as intended
         final Gson gson = SL.get(GsonService.class).provide();
         return gson.toJson(mKMapCollection);
     }
@@ -111,6 +112,16 @@ public class KMapView extends View {
         final KMapCollection kMapCollection = gson.fromJson(savedJson, KMapCollection.class);
         kMapCollection.afterGsonDeserialization();
         return new KMapView(context, kMapCollection);
+    }
+
+    public void addVariable() {
+        mKMapCollection.incrementVariable();
+        requestLayout();
+    }
+
+    public void removeVariable() {
+        mKMapCollection.decrementVariable();
+        requestLayout();
     }
 
     @Override
@@ -262,7 +273,7 @@ public class KMapView extends View {
             int y = 0;
             for (int yCoord = topGridPosition; yCoord < rowSize * mCellSizeInPx + topGridPosition; yCoord += mCellSizeInPx) {
                 canvas.drawText(
-                        mKMapCollection.get(x, y++).toString(), // TODO set real values
+                        mKMapCollection.get(x, y++).toString(),
                         xCoord + mCellSizeInPx / 2,
                         yCoord + mCellSizeInPx / 2 - ((mCellValuePaint.descent() + mCellValuePaint.ascent()) / 2),
                         mCellValuePaint);
@@ -339,6 +350,9 @@ public class KMapView extends View {
                 break;
             case 1:
                 topVariablePositions = POSITIONS_OF_1_VARIABLE;
+                break;
+            case 0:
+                topVariablePositions = POSITIONS_OF_0_VARIABLES;
                 break;
             default:
                 throw new IllegalArgumentException("Unsupported number of variables: " + mKMapCollection.getNumberOfColumnVariables());
