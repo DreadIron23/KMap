@@ -102,7 +102,7 @@ public class KMapView extends View {
         mVariableTextPaint.setAntiAlias(true);
     }
 
-    public String onSave() { // TODO resolve saving mechanism; check if working as intended
+    public String onSave() {
         final Gson gson = SL.get(GsonService.class).provide();
         return gson.toJson(mKMapCollection);
     }
@@ -122,6 +122,18 @@ public class KMapView extends View {
     public void removeVariable() {
         mKMapCollection.decrementVariable();
         requestLayout();
+    }
+
+    public KMapCollection getKMapCollection() {
+        return mKMapCollection;
+    }
+
+    public void setTitle(String title) {
+        mKMapCollection.setTitle(title);
+    }
+
+    public String getTitle() {
+        return mKMapCollection.getTitle();
     }
 
     @Override

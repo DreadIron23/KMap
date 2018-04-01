@@ -8,7 +8,7 @@ import sk.uniza.fri.janmokry.karnaughmap.kmap.helper.Position;
 import sk.uniza.fri.janmokry.karnaughmap.util.BitOperationUtil;
 
 /**
- * Collection holding KMap cells and operations relation to them.
+ * Collection holding KMap cells and operations related to them. Data holder for KMap.
  */
 public class KMapCollection implements Serializable {
 
@@ -21,6 +21,7 @@ public class KMapCollection implements Serializable {
     private transient ArrayList<KMapCell> mList = new ArrayList<>(NUMBER_OF_CELLS); // TODO: intended for TruthTable linkage
 
     private int mNumberOfVariables;
+    private String mTitle;
 
     public KMapCollection(int numberOfVariables) {
         if (numberOfVariables > MAX_NUMBER_OF_VARIABLES) {
@@ -83,5 +84,13 @@ public class KMapCollection implements Serializable {
             }
         }
         Collections.sort(mList, (first, second) -> first.getValue() - second.getValue());
+    }
+
+    public void setTitle(String title) {
+        mTitle = title;
+    }
+
+    public String getTitle() {
+        return mTitle;
     }
 }

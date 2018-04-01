@@ -1,7 +1,6 @@
 package sk.uniza.fri.janmokry.karnaughmap.fragment;
 
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
@@ -15,18 +14,20 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.OnClick;
 import sk.uniza.fri.janmokry.karnaughmap.R;
+import sk.uniza.fri.janmokry.karnaughmap.data.ProjectKMap;
 import sk.uniza.fri.janmokry.karnaughmap.view.KMapItem;
 import sk.uniza.fri.janmokry.karnaughmap.view.KMapView;
-import sk.uniza.fri.janmokry.karnaughmap.viewmodel.EmptyViewModel;
-import sk.uniza.fri.janmokry.karnaughmap.viewmodel.view.IEmptyView;
+import sk.uniza.fri.janmokry.karnaughmap.viewmodel.KarnaughMapsViewModel;
+import sk.uniza.fri.janmokry.karnaughmap.viewmodel.ProjectViewModel;
+import sk.uniza.fri.janmokry.karnaughmap.viewmodel.view.IKarnaughMapsView;
 
 /**
  * View logic
  */
-public class KarnaughMapsFragment extends ProjectBaseFragment<IEmptyView, EmptyViewModel> implements IEmptyView {
+public class KarnaughMapsFragment extends ProjectBaseFragment<IKarnaughMapsView, KarnaughMapsViewModel> implements IKarnaughMapsView {
 
-    private static final String ARG_KMAPS = "arg_kmaps";
     private static final int MAX_ALLOWED_KMAPS = 8;
+    private static final String KMAP_BASE_TITLE = "y";
 
     public static KarnaughMapsFragment newInstance() {
         return new KarnaughMapsFragment();
@@ -48,7 +49,7 @@ public class KarnaughMapsFragment extends ProjectBaseFragment<IEmptyView, EmptyV
                 .setTitle(R.string.project_screen_delete_dialog_title)
                 .setMessage(R.string.project_screen_delete_dialog_message)
                 .setPositiveButton(R.string.project_screen_delete_dialog_delete, (dialog, whichButton) ->
-                        removeKMapItem(clickedView) // TODO: this need to be delegated to Model for further processing (TruthTable syncing ect)
+                        removeKMapItem(clickedView)
                 )
                 .setNegativeButton(R.string.project_screen_delete_dialog_discard, null)
                 .show();
@@ -60,29 +61,45 @@ public class KarnaughMapsFragment extends ProjectBaseFragment<IEmptyView, EmptyV
 
         setAddKMapButtonVisibility();
         setNoDataMessageVisibility();
+
+        renameKMapsAccordingToOrder();
+        showToast(getResources().getString(
+                R.string.project_screen_toast_deleted_kmap,
+                itemToRemove.getKMap().getKMapCollection().getTitle()));
+
+        getViewModel().onKMapRemoval(itemToRemove.getKMap().getKMapCollection());
+    }
+
+    /** This renaming is quite dumb but this is what we have for now */
+    private void renameKMapsAccordingToOrder() {
+        int counter = 0;
+        for (KMapItem kMapItem : mKMapItems) {
+            kMapItem.setTitle(KMAP_BASE_TITLE + counter++);
+            kMapItem.invalidate();
+        }
     }
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        if (savedInstanceState == null) {
+        getProjectViewModel().mProjectKMaps.observe(this, projectKMaps -> {
 
-        } else {
+            if (projectKMaps != null) {
+                mKMapItemContainer.removeAllViews();
+                for (ProjectKMap projectKMap : projectKMaps) {
+                    KMapItem itemView = new KMapItem(getContext());
+                    itemView.setOnBinClickedListener(onBinClickedListener);
+                    final KMapView kMap = KMapView.onLoad(getContext(), projectKMap.gsonData);
+                    itemView.addKMap(kMap);
 
-            ArrayList<String> serializedKMapViews = savedInstanceState.getStringArrayList(ARG_KMAPS);
-            for (String kmapJson : serializedKMapViews) {
-                KMapItem itemView = new KMapItem(getContext());
-                itemView.setOnBinClickedListener(onBinClickedListener);
-                final KMapView kMap = KMapView.onLoad(getContext(), kmapJson);
-                itemView.addKMap(kMap);
+                    mKMapItemContainer.addView(itemView);
+                    mKMapItems.add(itemView);
+                }
 
-                mKMapItemContainer.addView(itemView);
-                mKMapItems.add(itemView);
+                setNoDataMessageVisibility();
             }
-        }
-
-        setNoDataMessageVisibility();
+        });
     }
 
     @Override
@@ -95,22 +112,28 @@ public class KarnaughMapsFragment extends ProjectBaseFragment<IEmptyView, EmptyV
     }
 
     @Override
-    public void onSaveInstanceState(@NonNull Bundle outState) {
-        super.onSaveInstanceState(outState);
+    public void onStop() {
+        super.onStop();
 
-        ArrayList<String> serializedKMapViews = new ArrayList<>();
+        // saving state
+        ArrayList<String> serializedKMapCollections = new ArrayList<>();
+        ArrayList<String> kMapTitles = new ArrayList<>();
         for (KMapItem kMapItem : mKMapItems) {
-            serializedKMapViews.add(kMapItem.getKMap().onSave());
+            serializedKMapCollections.add(kMapItem.getKMap().onSave());
+            kMapTitles.add(kMapItem.getKMap().getTitle());
         }
-        outState.putStringArrayList(ARG_KMAPS, serializedKMapViews);
+
+        getProjectViewModel().onKarnaughMapsSave(serializedKMapCollections, kMapTitles);
     }
 
     @OnClick(R.id.add_kmap)
     public void onAddKMapButtonClicked() {
-        // TODO: this need to be delegated to Model for further processing (TruthTable syncing ect)
+        final String kMapTitle = KMAP_BASE_TITLE + mKMapItems.size();
+
         KMapItem itemView = new KMapItem(getContext());
         itemView.setOnBinClickedListener(onBinClickedListener);
         KMapView kMap = new KMapView(getContext());
+        kMap.setTitle(kMapTitle);
         itemView.addKMap(kMap);
 
         mKMapItemContainer.addView(itemView);
@@ -118,6 +141,8 @@ public class KarnaughMapsFragment extends ProjectBaseFragment<IEmptyView, EmptyV
 
         setAddKMapButtonVisibility();
         setNoDataMessageVisibility();
+
+        getViewModel().onKMapAddition(kMap.getKMapCollection());
     }
 
     private void setAddKMapButtonVisibility() {
@@ -134,5 +159,10 @@ public class KarnaughMapsFragment extends ProjectBaseFragment<IEmptyView, EmptyV
         } else {
             mNoDataMessage.setVisibility(View.GONE);
         }
+    }
+
+    @Override
+    public ProjectViewModel getProjectViewModel() {
+        return ((ProjectFragment) getParentFragment()).getViewModel();
     }
 }

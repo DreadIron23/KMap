@@ -28,7 +28,7 @@ public class KMapItem extends FrameLayout {
     }
 
     @BindView(R.id.title)
-    protected TextView mTitle; // TODO: Resolve naming mechanism
+    protected TextView mTitleView;
 
     @BindView(R.id.minus)
     protected ImageView mMinus;
@@ -82,6 +82,12 @@ public class KMapItem extends FrameLayout {
         mKMapItemContainer.removeAllViews();
         mAttachedKMap = kMapView;
         mKMapItemContainer.addView(kMapView);
+        mTitleView.setText(kMapView.getKMapCollection().getTitle());
+    }
+
+    public void setTitle(String title) {
+        mAttachedKMap.setTitle(title);
+        setTitleViewText();
     }
 
     public KMapView getKMap() {
@@ -107,5 +113,10 @@ public class KMapItem extends FrameLayout {
         if (onBinClickedListener != null) {
             onBinClickedListener.onBinClickedListener(this);
         }
+    }
+
+    /** Sets title from attached KMap */
+    private void setTitleViewText() {
+        mTitleView.setText(mAttachedKMap.getKMapCollection().getTitle());
     }
 }

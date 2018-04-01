@@ -37,5 +37,6 @@
     <string name="project_screen_delete_dialog_message">Si si istý, že chceš mapu zahodiť?</string>
     <string name="project_screen_delete_dialog_delete">zahodiť</string>
     <string name="project_screen_delete_dialog_discard">zrušiť</string>
+    <string name="project_screen_toast_deleted_kmap">Mapa %s vymazaná\nMapy boli premenované podľa poradia</string>
 
 </resources>

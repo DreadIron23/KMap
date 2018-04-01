@@ -53,7 +53,7 @@ public class ProjectInfoManager implements SL.IService {
                 .subscribe(onComplete);
     }
 
-    public void delete(ProjectInfo projectInfo, Action onComplete) {
+    public void deleteAsync(ProjectInfo projectInfo, Action onComplete) {
         Completable.fromRunnable( () -> mProjectInfoDao.delete(projectInfo))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())

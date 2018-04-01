@@ -3,15 +3,14 @@ package sk.uniza.fri.janmokry.karnaughmap.activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.widget.Toolbar;
 
 import sk.uniza.fri.janmokry.karnaughmap.R;
 import sk.uniza.fri.janmokry.karnaughmap.data.ProjectInfo;
 import sk.uniza.fri.janmokry.karnaughmap.fragment.ProjectFragment;
-import sk.uniza.fri.janmokry.karnaughmap.viewmodel.ProjectViewModel;
-import sk.uniza.fri.janmokry.karnaughmap.viewmodel.view.IProjectView;
+import sk.uniza.fri.janmokry.karnaughmap.viewmodel.EmptyViewModel;
+import sk.uniza.fri.janmokry.karnaughmap.viewmodel.view.IEmptyView;
 
-public class ProjectActivity extends ProjectBaseActivity<IProjectView, ProjectViewModel> {
+public class ProjectActivity extends ProjectBaseActivity<IEmptyView, EmptyViewModel> {
 
     public static final String EXTRA_PROJECT_INFO = "project_info";
 
@@ -28,13 +27,6 @@ public class ProjectActivity extends ProjectBaseActivity<IProjectView, ProjectVi
 
     @Override
     protected void init(Bundle savedInstanceState) {
-        setContentView(R.layout.activity_project);
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_close);
-        }
 
         if (savedInstanceState == null) {
             final ProjectInfo projectInfo = (ProjectInfo) getIntent().getExtras().getSerializable(EXTRA_PROJECT_INFO);

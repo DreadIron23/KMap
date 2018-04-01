@@ -3,6 +3,7 @@ package sk.uniza.fri.janmokry.karnaughmap.fragment;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
+import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -62,7 +63,14 @@ public class ProjectFragment extends ProjectBaseFragment<IProjectView, ProjectVi
 
     @Override
     protected void init() {
-        ((ProjectBaseActivity)getActivity()).setSupportActionBar(mToolbar);
+
+        final ProjectBaseActivity projectBaseActivity = (ProjectBaseActivity) getActivity();
+        projectBaseActivity.setSupportActionBar(mToolbar);
+        final ActionBar supportActionBar = projectBaseActivity.getSupportActionBar();
+        if (supportActionBar != null) {
+            supportActionBar.setDisplayHomeAsUpEnabled(true);
+        }
+
         final ProjectInfo projectInfo = (ProjectInfo) getArguments().getSerializable(ARG_PROJECT_INFO);
         setTitle(projectInfo.name);
     }
