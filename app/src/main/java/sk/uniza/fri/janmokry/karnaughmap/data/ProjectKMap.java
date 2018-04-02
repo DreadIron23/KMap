@@ -5,8 +5,6 @@ import android.arch.persistence.room.Entity;
 import android.support.annotation.NonNull;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 
 import static sk.uniza.fri.janmokry.karnaughmap.data.ProjectKMap.COLUMN_PROJECT_ID;
 import static sk.uniza.fri.janmokry.karnaughmap.data.ProjectKMap.COLUMN_TITLE;
@@ -24,14 +22,6 @@ public class ProjectKMap implements Serializable {
     public static final String COLUMN_PROJECT_ID = "project_id";
     public static final String COLUMN_TITLE = "name";
     public static final String COLUMN_GSON_DATA = "gson_data";
-
-    public static List<ProjectKMap> transform(ProjectInfo projectInfo, List<String> serializedKMapCollections, List<String> kMapTitles) {
-        List<ProjectKMap> listToReturn = new ArrayList<>();
-        for (int index = 0; index < serializedKMapCollections.size(); index++) {
-            listToReturn.add(new ProjectKMap(projectInfo.id, kMapTitles.get(index), serializedKMapCollections.get(index)));
-        }
-        return listToReturn;
-    }
 
     @ColumnInfo(index = true, name = COLUMN_PROJECT_ID)
     public final long projectId;

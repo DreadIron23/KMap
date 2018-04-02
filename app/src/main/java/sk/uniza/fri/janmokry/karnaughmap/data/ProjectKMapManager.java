@@ -2,12 +2,15 @@ package sk.uniza.fri.janmokry.karnaughmap.data;
 
 import android.arch.lifecycle.LiveData;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import io.reactivex.Completable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.Action;
 import io.reactivex.schedulers.Schedulers;
+import sk.uniza.fri.janmokry.karnaughmap.kmap.KMapCollection;
+import sk.uniza.fri.janmokry.karnaughmap.util.ConversionUtil;
 import sk.uniza.fri.janmokry.karnaughmap.util.SL;
 
 /**
@@ -29,11 +32,11 @@ public class ProjectKMapManager implements SL.IService {
                 .subscribe(onComplete);
     }
 
-    public void updateProjectKMapsAsync(ProjectInfo projectInfo, List<String> serializedKMapCollections,
-                                        List<String> kMapTitles, Action onComplete) {
+    public void updateProjectKMapsAsync(ProjectInfo projectInfo, ArrayList<KMapCollection> kMapCollections,
+                                        Action onComplete) {
         Completable.fromRunnable( () -> {
             mProjectKMapDao.deleteAllWhereProjectIdIs(projectInfo.id);
-            mProjectKMapDao.insert(ProjectKMap.transform(projectInfo, serializedKMapCollections, kMapTitles));
+            mProjectKMapDao.insert(ConversionUtil.transformToProjectKMaps(projectInfo, kMapCollections));
         })
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())

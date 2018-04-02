@@ -12,7 +12,11 @@ public class TruthTableCollection {
 
     private List<KMapCollection> mKMapCollections;
 
-    public TruthTableCollection(List<KMapCollection> mKMapCollections) {
-        this.mKMapCollections = mKMapCollections;
+    public TruthTableCollection(List<KMapCollection> kMapCollections) {
+        this.mKMapCollections = kMapCollections;
+    }
+
+    public List<KMapCollection> getKMapCollections() {
+        return mKMapCollections;
     }
 }

@@ -10,15 +10,11 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 
-import com.google.gson.Gson;
-
 import sk.uniza.fri.janmokry.karnaughmap.R;
-import sk.uniza.fri.janmokry.karnaughmap.data.GsonService;
 import sk.uniza.fri.janmokry.karnaughmap.kmap.KMapCell;
 import sk.uniza.fri.janmokry.karnaughmap.kmap.KMapCollection;
 import sk.uniza.fri.janmokry.karnaughmap.util.BitOperationUtil;
 import sk.uniza.fri.janmokry.karnaughmap.util.GraphicsUtil;
-import sk.uniza.fri.janmokry.karnaughmap.util.SL;
 
 /**
  * View representing Karnaugh Map.
@@ -102,15 +98,11 @@ public class KMapView extends View {
         mVariableTextPaint.setAntiAlias(true);
     }
 
-    public String onSave() {
-        final Gson gson = SL.get(GsonService.class).provide();
-        return gson.toJson(mKMapCollection);
+    public KMapCollection onSave() {
+        return mKMapCollection;
     }
 
-    public static KMapView onLoad(Context context, @NonNull String savedJson) {
-        final Gson gson = SL.get(GsonService.class).provide();
-        final KMapCollection kMapCollection = gson.fromJson(savedJson, KMapCollection.class);
-        kMapCollection.afterGsonDeserialization();
+    public static KMapView onLoad(Context context, @NonNull KMapCollection kMapCollection) {
         return new KMapView(context, kMapCollection);
     }
 

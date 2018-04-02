@@ -14,7 +14,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.OnClick;
 import sk.uniza.fri.janmokry.karnaughmap.R;
-import sk.uniza.fri.janmokry.karnaughmap.data.ProjectKMap;
+import sk.uniza.fri.janmokry.karnaughmap.kmap.KMapCollection;
 import sk.uniza.fri.janmokry.karnaughmap.view.KMapItem;
 import sk.uniza.fri.janmokry.karnaughmap.view.KMapView;
 import sk.uniza.fri.janmokry.karnaughmap.viewmodel.KarnaughMapsViewModel;
@@ -83,14 +83,14 @@ public class KarnaughMapsFragment extends ProjectBaseFragment<IKarnaughMapsView,
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        getProjectViewModel().mProjectKMaps.observe(this, projectKMaps -> {
+        getProjectViewModel().mTruthTableCollection.observe(this, truthTableCollection -> {
 
-            if (projectKMaps != null) {
+            if (truthTableCollection != null) {
                 mKMapItemContainer.removeAllViews();
-                for (ProjectKMap projectKMap : projectKMaps) {
+                for (KMapCollection kMapCollection : truthTableCollection.getKMapCollections()) {
                     KMapItem itemView = new KMapItem(getContext());
                     itemView.setOnBinClickedListener(onBinClickedListener);
-                    final KMapView kMap = KMapView.onLoad(getContext(), projectKMap.gsonData);
+                    final KMapView kMap = KMapView.onLoad(getContext(), kMapCollection);
                     itemView.addKMap(kMap);
 
                     mKMapItemContainer.addView(itemView);
@@ -116,14 +116,12 @@ public class KarnaughMapsFragment extends ProjectBaseFragment<IKarnaughMapsView,
         super.onStop();
 
         // saving state
-        ArrayList<String> serializedKMapCollections = new ArrayList<>();
-        ArrayList<String> kMapTitles = new ArrayList<>();
+        ArrayList<KMapCollection> kKMapCollections = new ArrayList<>();
         for (KMapItem kMapItem : mKMapItems) {
-            serializedKMapCollections.add(kMapItem.getKMap().onSave());
-            kMapTitles.add(kMapItem.getKMap().getTitle());
+            kKMapCollections.add(kMapItem.getKMap().onSave());
         }
 
-        getProjectViewModel().onKarnaughMapsSave(serializedKMapCollections, kMapTitles);
+        getProjectViewModel().onKarnaughMapsSave(kKMapCollections);
     }
 
     @OnClick(R.id.add_kmap)
