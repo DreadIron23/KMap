@@ -10,6 +10,7 @@ import android.util.AttributeSet;
 import android.view.View;
 
 import sk.uniza.fri.janmokry.karnaughmap.R;
+import sk.uniza.fri.janmokry.karnaughmap.kmap.TruthTableCollection;
 import sk.uniza.fri.janmokry.karnaughmap.util.GraphicsUtil;
 
 /**
@@ -23,6 +24,7 @@ public class TruthTableView extends View {
     private static final int CELL_SIZE_IN_DP = 32; // TODO make settable from XML
 
     private int mCellSizeInPx;
+    private TruthTableCollection mTruthTableCollection;
 
     private Context mContext;
     private Paint mLinePaint = new Paint();
@@ -33,30 +35,37 @@ public class TruthTableView extends View {
     public TruthTableView(Context context) {
         super(context);
 
-        init(context);
+        init(context, null);
     }
 
     public TruthTableView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
 
-        init(context);
+        init(context, null);
     }
 
     public TruthTableView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
 
-        init(context);
+        init(context, null);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public TruthTableView(Context context, @Nullable AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
 
-        init(context);
+        init(context, null);
     }
 
-    private void init(Context context) {
+    public TruthTableView(Context context, TruthTableCollection truthTableCollection) {
+        super(context);
+
+        init(context, truthTableCollection);
+    }
+
+    private void init(Context context, @Nullable TruthTableCollection truthTableCollection) {
         mContext = context;
+        mTruthTableCollection = truthTableCollection;
         final Resources resources = context.getResources();
 
         mCellSizeInPx = GraphicsUtil.dpToPx(resources, CELL_SIZE_IN_DP);
@@ -154,7 +163,7 @@ public class TruthTableView extends View {
 //        final int textWidth = (int) mVariableTextPaint.measureText("  X8");
 //        return mCellSizeInPx * columnSize + leftGridPosition + getPaddingRight() + textWidth;
 //    }
-//
+
 //    @Override
 //    protected void onDraw(Canvas canvas) {
 //        super.onDraw(canvas);

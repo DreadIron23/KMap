@@ -33,6 +33,7 @@
     <!-- KMaps fragment -->
 
     <string name="project_screen_no_map_message">Projekt je prázdny\nMapu pridáš pluskom dole</string>
+    <string name="project_screen_no_table_message">Projekt je prázdny</string>
     <string name="project_screen_delete_dialog_title">Zahodiť mapu?</string>
     <string name="project_screen_delete_dialog_message">Si si istý, že chceš mapu zahodiť?</string>
     <string name="project_screen_delete_dialog_delete">zahodiť</string>

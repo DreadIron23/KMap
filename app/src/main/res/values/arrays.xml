@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Kelly's 20 maximum contrast colors
+         see https://stackoverflow.com/a/4382138
+         -->
+    <integer-array name="palette_of_20_colors" >
+        <item>@color/vivid_yellow</item>
+        <item>@color/strong_purple</item>
+        <item>@color/vivid_orange</item>
+        <item>@color/very_light_blue</item>
+        <item>@color/vivid_red</item>
+        <item>@color/grayish_yellow</item>
+        <item>@color/medium_gray</item>
+        <item>@color/vivid_green</item>
+        <item>@color/strong_purplish_pink</item>
+        <item>@color/strong_blue</item>
+        <item>@color/strong_yellowish_pink</item>
+        <item>@color/strong_violet</item>
+        <item>@color/vivid_orange_yellow</item>
+        <item>@color/strong_purplish_red</item>
+        <item>@color/vivid_greenish_yellow</item>
+        <item>@color/strong_reddish_brown</item>
+        <item>@color/vivid_yellowish_green</item>
+        <item>@color/deep_yellowish_brown</item>
+        <item>@color/vivid_reddish_orange</item>
+        <item>@color/dark_olive_green</item>
+    </integer-array>
+
+    <!-- Boynton's 9 maximum contrast colors -->
+    <integer-array name="palette_of_9_colors" >
+        <item>@color/blue</item>
+        <item>@color/red</item>
+        <item>@color/green</item>
+        <item>@color/yellow</item>
+        <item>@color/magenta</item>
+        <item>@color/pink</item>
+        <item>@color/gray</item>
+        <item>@color/brown</item>
+        <item>@color/orange</item>
+    </integer-array>
+
+</resources>

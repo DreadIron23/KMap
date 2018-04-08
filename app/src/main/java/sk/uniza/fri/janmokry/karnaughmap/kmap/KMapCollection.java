@@ -1,22 +1,45 @@
 package sk.uniza.fri.janmokry.karnaughmap.kmap;
 
+import android.support.annotation.NonNull;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
+import sk.uniza.fri.janmokry.karnaughmap.algorithm.quinemccluskey.Number;
+import sk.uniza.fri.janmokry.karnaughmap.algorithm.quinemccluskey.Solution;
+import sk.uniza.fri.janmokry.karnaughmap.algorithm.quinemccluskey.util.NumberUtil;
+import sk.uniza.fri.janmokry.karnaughmap.data.ColorPaletteService;
 import sk.uniza.fri.janmokry.karnaughmap.kmap.helper.Position;
 import sk.uniza.fri.janmokry.karnaughmap.util.BitOperationUtil;
+import sk.uniza.fri.janmokry.karnaughmap.util.SL;
+
+import static sk.uniza.fri.janmokry.karnaughmap.util.MathUtil.floorMod;
 
 /**
  * Collection holding KMap cells and operations related to them. Data holder for KMap.
  */
 public class KMapCollection implements Serializable {
 
+    public static class MinTermsAndDontCares {
+
+        public final List<Number> minTerms;
+        public final List<Number> dontCares;
+
+        public MinTermsAndDontCares(int numberOfVariables, List<Integer> minTerms, List<Integer> dontCares) {
+            this.minTerms = NumberUtil.wrap(numberOfVariables, minTerms);
+            this.dontCares = NumberUtil.wrap(numberOfVariables, dontCares);
+        }
+    }
+
     private static final int MAX_NUMBER_OF_VARIABLES = 8;
     private static final int MIN_NUMBER_OF_VARIABLES = 1;
     private static final int NUMBER_OF_CELLS = 256;
     // as for now, we support Karnaugh Map up to 8 variables, i.e. 4x4, 16x16 dimensions respectively
     private final KMapCell[][] mCells = new KMapCell[16][16]; //columns, rows
+
+    private Solution mSolution;
 
     private transient ArrayList<KMapCell> mList = new ArrayList<>(NUMBER_OF_CELLS); // TODO: intended for TruthTable linkage
 
@@ -53,6 +76,10 @@ public class KMapCollection implements Serializable {
 
     public int getNumberOfColumnVariables() {
         return mNumberOfVariables / 2 + mNumberOfVariables % 2;
+    }
+
+    public int getNumberOfVariables() {
+        return mNumberOfVariables;
     }
 
     public KMapCell get(int x, int y) {
@@ -92,5 +119,91 @@ public class KMapCollection implements Serializable {
 
     public String getTitle() {
         return mTitle;
+    }
+
+    public void setSolution(@NonNull Solution solution) {
+        mSolution = solution;
+        prepareCellsForConfigurationDrawing();
+    }
+
+    public MinTermsAndDontCares getMinTermsAndDontCares() {
+        final List<Integer> minTerms = new ArrayList<>();
+        final List<Integer> dontCares = new ArrayList<>();
+        for (int columnIndex = 0; columnIndex < getColumnSize(); columnIndex++) {
+            for (int rowIndex = 0; rowIndex < getRowSize(); rowIndex++) {
+                final KMapCell cell = mCells[columnIndex][rowIndex];
+                switch (cell.getBitRepresentation()) {
+                    case KMapCell.VALUE_1: {
+                        minTerms.add(cell.getValue());
+                        break;
+                    }
+                    case KMapCell.VALUE_X: {
+                        dontCares.add(cell.getValue());
+                        break;
+                    }
+                }
+            }
+        }
+
+        return new MinTermsAndDontCares(mNumberOfVariables, minTerms, dontCares);
+    }
+
+    private void prepareCellsForConfigurationDrawing() {
+        if (mSolution.isObsolete(mNumberOfVariables)) {
+            return;
+        }
+        for (KMapCell cell : mList) {
+            cell.reset();
+        }
+
+        final int[] colorPalette = SL.get(ColorPaletteService.class).providePaletteFor(mSolution.getSolution().size());
+
+        int paletteIndex = 0;
+        for (Number configuration : mSolution.getSolution()) {
+            final int color = colorPalette[paletteIndex++ % (colorPalette.length - 1)];
+            boolean[][] kMapConfiguration = new boolean[getColumnSize()][getRowSize()];
+            final List<Integer> allCoveredMinTerms = configuration.getAllCoveredMinTerms();
+            final ArrayList<Position> positionBuffer = new ArrayList<>();
+
+            for (Integer coveredMinTerm : allCoveredMinTerms) { // set kMapConfiguration
+                final Position position = BitOperationUtil.calculatePosition(coveredMinTerm);
+                kMapConfiguration[position.x][position.y] = true;
+                positionBuffer.add(position);
+            }
+
+            // calculate graphics for mCells
+            for (Position position : positionBuffer) {
+                // check top, right, bottom, left neighbours
+                final int xSize = kMapConfiguration.length;
+                final int ySize = kMapConfiguration[0].length;
+
+                // checks: if its size 1 then its a point; if its boundary item -> if so we check if its set across all column/row; check relevant neighbour
+                final boolean left = xSize > 1 && !(position.x == 0 && isWholeRowSet(kMapConfiguration, position.y)) &&
+                        kMapConfiguration[floorMod(position.x - 1, xSize)][position.y];
+                final boolean top = ySize > 1 && !(position.y == 0 && isWholeColumnSet(kMapConfiguration[position.x])) &&
+                        kMapConfiguration[position.x][floorMod(position.y - 1, ySize)];
+                final boolean right = xSize > 1 && !(position.x == xSize - 1 && isWholeRowSet(kMapConfiguration, position.y)) &&
+                        kMapConfiguration[floorMod(position.x + 1, xSize)][position.y];
+                final boolean bottom = ySize > 1 && !(position.y == ySize - 1 && isWholeColumnSet(kMapConfiguration[position.x])) &&
+                        kMapConfiguration[position.x][floorMod(position.y + 1, ySize)];
+
+                final ConfigurationShapes shape = ConfigurationShapes.getType(left, top, right, bottom);
+                mCells[position.x][position.y].addShape(new KMapCell.ConfigurationShape(shape, color));
+            }
+        }
+    }
+
+    private boolean isWholeRowSet(boolean[][] kMapConfiguration, int nthRow) {
+        for (int index = 0; index < kMapConfiguration.length; index++) {
+            if (!kMapConfiguration[index][nthRow]) return false;
+        }
+        return true;
+    }
+
+    private boolean isWholeColumnSet(boolean[] kMapConfigurationLine) {
+        for (boolean value : kMapConfigurationLine) {
+            if (!value) return false;
+        }
+        return true;
     }
 }

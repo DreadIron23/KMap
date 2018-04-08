@@ -3,7 +3,9 @@ package sk.uniza.fri.janmokry.karnaughmap.util;
 import android.content.Context;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
+import android.graphics.Color;
 import android.support.annotation.AttrRes;
+import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
 import android.util.TypedValue;
 
@@ -29,5 +31,16 @@ public class GraphicsUtil {
         a.recycle();
 
         return color;
+    }
+
+    /**
+     * @param coefficient 0.8 = 80%; 0.45 = 45% ect
+     */
+    public static @ColorInt int getLighterColor(@ColorInt int color, float coefficient) {
+
+        final float[] hsv = new float[3];
+        Color.colorToHSV(color, hsv);
+        hsv[1] *= coefficient;
+        return Color.HSVToColor(hsv);
     }
 }

@@ -7,4 +7,40 @@
     <color name="colorGray">#BDBDBD</color>
     <color name="lighterTextColor">#9B9B9B</color>
     <color name="redColor">#F44336</color>
+
+    <!-- Kelly's 20 maximum contrast colors
+         see https://stackoverflow.com/a/4382138
+         -->
+    <color name="vivid_yellow">#FFB300</color>
+    <color name="strong_purple">#803E75</color>
+    <color name="vivid_orange">#FF6800</color>
+    <color name="very_light_blue">#A6BDD7</color>
+    <color name="vivid_red">#C10020</color>
+    <color name="grayish_yellow">#CEA262</color>
+    <color name="medium_gray">#817066</color>
+    <color name="vivid_green">#007D34</color>
+    <color name="strong_purplish_pink">#F6768E</color>
+    <color name="strong_blue">#00538A</color>
+    <color name="strong_yellowish_pink">#FF7A5C</color>
+    <color name="strong_violet">#53377A</color>
+    <color name="vivid_orange_yellow">#FF8E00</color>
+    <color name="strong_purplish_red">#B32851</color>
+    <color name="vivid_greenish_yellow">#F4C800</color>
+    <color name="strong_reddish_brown">#7F180D</color>
+    <color name="vivid_yellowish_green">#93AA00</color>
+    <color name="deep_yellowish_brown">#593315</color>
+    <color name="vivid_reddish_orange">#F13A13</color>
+    <color name="dark_olive_green">#232C16</color>
+
+    <!-- Boynton's 9 maximum contrast colors -->
+    <color name="blue">#0000FF</color>
+    <color name="red">#FF0000</color>
+    <color name="green">#00FF00</color>
+    <color name="yellow">#FFFF00</color>
+    <color name="magenta">#FF00FF</color>
+    <color name="pink">#FF8080</color>
+    <color name="gray">#808080</color>
+    <color name="brown">#800000</color>
+    <color name="orange">#FF8000</color>
+
 </resources>

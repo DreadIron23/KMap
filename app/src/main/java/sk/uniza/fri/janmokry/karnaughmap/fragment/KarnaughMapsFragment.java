@@ -1,7 +1,6 @@
 package sk.uniza.fri.janmokry.karnaughmap.fragment;
 
-import android.os.Bundle;
-import android.support.annotation.Nullable;
+import android.arch.lifecycle.Observer;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
 import android.view.View;
@@ -14,6 +13,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.OnClick;
 import sk.uniza.fri.janmokry.karnaughmap.R;
+import sk.uniza.fri.janmokry.karnaughmap.algorithm.quinemccluskey.Solution;
 import sk.uniza.fri.janmokry.karnaughmap.kmap.KMapCollection;
 import sk.uniza.fri.janmokry.karnaughmap.view.KMapItem;
 import sk.uniza.fri.janmokry.karnaughmap.view.KMapView;
@@ -33,6 +33,11 @@ public class KarnaughMapsFragment extends ProjectBaseFragment<IKarnaughMapsView,
         return new KarnaughMapsFragment();
     }
 
+    public interface OnKMapConfigurationComputationTriggerListener {
+
+        void onKMapConfigurationComputationTrigger(KMapCollection collection);
+    }
+
     @BindView(R.id.kmap_item_container)
     protected LinearLayout mKMapItemContainer;
 
@@ -44,13 +49,30 @@ public class KarnaughMapsFragment extends ProjectBaseFragment<IKarnaughMapsView,
 
     private List<KMapItem> mKMapItems = new ArrayList<>();
 
+    private final Observer<Solution> mSolutionObserver = solution -> {
+        if (solution != null) {
+            for (KMapItem kMapItem : mKMapItems) {
+                final KMapView kMap = kMapItem.getKMap();
+                if (kMap.getTitle().equals(solution.getTitle())) {
+                    kMap.getKMapCollection().setSolution(solution);
+                    kMap.invalidate();
+                }
+            }
+        }
+    };
+
+    private final OnKMapConfigurationComputationTriggerListener mConfigurationComputationTriggerListener = collection -> {
+        getViewModel().onKMapConfigurationComputationTrigger(collection);
+    };
+
     private KMapItem.OnBinClickedListener onBinClickedListener = clickedView -> {
         new AlertDialog.Builder(getContext(), R.style.DialogStyle)
                 .setTitle(R.string.project_screen_delete_dialog_title)
                 .setMessage(R.string.project_screen_delete_dialog_message)
-                .setPositiveButton(R.string.project_screen_delete_dialog_delete, (dialog, whichButton) ->
-                        removeKMapItem(clickedView)
-                )
+                .setPositiveButton(R.string.project_screen_delete_dialog_delete, (dialog, whichButton) -> {
+                    removeKMapItem(clickedView);
+                    renameKMapsAccordingToOrder();
+                })
                 .setNegativeButton(R.string.project_screen_delete_dialog_discard, null)
                 .show();
     };
@@ -62,7 +84,6 @@ public class KarnaughMapsFragment extends ProjectBaseFragment<IKarnaughMapsView,
         setAddKMapButtonVisibility();
         setNoDataMessageVisibility();
 
-        renameKMapsAccordingToOrder();
         showToast(getResources().getString(
                 R.string.project_screen_toast_deleted_kmap,
                 itemToRemove.getKMap().getKMapCollection().getTitle()));
@@ -73,33 +94,19 @@ public class KarnaughMapsFragment extends ProjectBaseFragment<IKarnaughMapsView,
     /** This renaming is quite dumb but this is what we have for now */
     private void renameKMapsAccordingToOrder() {
         int counter = 0;
+        final List<String> oldTitles = new ArrayList<>();
+        final List<String> newTitles = new ArrayList<>();
         for (KMapItem kMapItem : mKMapItems) {
-            kMapItem.setTitle(KMAP_BASE_TITLE + counter++);
+            final String oldTitle = kMapItem.getKMap().getTitle();
+            final String newTitle = KMAP_BASE_TITLE + counter++;
+            kMapItem.setTitle(newTitle);
             kMapItem.invalidate();
+
+            oldTitles.add(oldTitle);
+            newTitles.add(newTitle);
         }
-    }
 
-    @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-
-        getProjectViewModel().mTruthTableCollection.observe(this, truthTableCollection -> {
-
-            if (truthTableCollection != null) {
-                mKMapItemContainer.removeAllViews();
-                for (KMapCollection kMapCollection : truthTableCollection.getKMapCollections()) {
-                    KMapItem itemView = new KMapItem(getContext());
-                    itemView.setOnBinClickedListener(onBinClickedListener);
-                    final KMapView kMap = KMapView.onLoad(getContext(), kMapCollection);
-                    itemView.addKMap(kMap);
-
-                    mKMapItemContainer.addView(itemView);
-                    mKMapItems.add(itemView);
-                }
-
-                setNoDataMessageVisibility();
-            }
-        });
+        getViewModel().onKMapsTitleChange(oldTitles, newTitles);
     }
 
     @Override
@@ -109,6 +116,27 @@ public class KarnaughMapsFragment extends ProjectBaseFragment<IKarnaughMapsView,
 
     @Override
     protected void init() {
+        getProjectViewModel().mTruthTableCollection.observe(this, truthTableCollection -> {
+
+            if (truthTableCollection != null) {
+                mKMapItemContainer.removeAllViews();
+                mKMapItems.clear();
+                for (KMapCollection kMapCollection : truthTableCollection.getKMapCollections()) {
+                    final KMapItem itemView = new KMapItem(getContext());
+                    itemView.setOnBinClickedListener(onBinClickedListener);
+                    final KMapView kMap = KMapView.onLoad(getContext(), kMapCollection,
+                            mConfigurationComputationTriggerListener);
+                    itemView.addKMap(kMap);
+
+                    mKMapItemContainer.addView(itemView);
+                    mKMapItems.add(itemView);
+
+                    getViewModel().registerKMapForConfigurationCalculations(kMap.getTitle(), this, mSolutionObserver);
+                }
+
+                setNoDataMessageVisibility();
+            }
+        });
     }
 
     @Override
@@ -130,9 +158,10 @@ public class KarnaughMapsFragment extends ProjectBaseFragment<IKarnaughMapsView,
 
         KMapItem itemView = new KMapItem(getContext());
         itemView.setOnBinClickedListener(onBinClickedListener);
-        KMapView kMap = new KMapView(getContext());
+        KMapView kMap = new KMapView(getContext(), mConfigurationComputationTriggerListener);
         kMap.setTitle(kMapTitle);
         itemView.addKMap(kMap);
+        getViewModel().registerKMapForConfigurationCalculations(kMapTitle, this, mSolutionObserver);
 
         mKMapItemContainer.addView(itemView);
         mKMapItems.add(itemView);
@@ -144,19 +173,11 @@ public class KarnaughMapsFragment extends ProjectBaseFragment<IKarnaughMapsView,
     }
 
     private void setAddKMapButtonVisibility() {
-        if (mKMapItems.size() == MAX_ALLOWED_KMAPS) {
-            mAddKMapButton.setVisibility(View.GONE);
-        } else {
-            mAddKMapButton.setVisibility(View.VISIBLE);
-        }
+        mAddKMapButton.setVisibility(mKMapItems.size() == MAX_ALLOWED_KMAPS ? View.GONE : View.VISIBLE);
     }
 
     private void setNoDataMessageVisibility() {
-        if (mKMapItems.isEmpty()) {
-            mNoDataMessage.setVisibility(View.VISIBLE);
-        } else {
-            mNoDataMessage.setVisibility(View.GONE);
-        }
+        mNoDataMessage.setVisibility(mKMapItems.isEmpty() ? View.VISIBLE : View.GONE);
     }
 
     @Override

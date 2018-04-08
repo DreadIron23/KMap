@@ -1,11 +1,31 @@
 package sk.uniza.fri.janmokry.karnaughmap.kmap;
 
+import android.support.annotation.ColorInt;
+import android.support.annotation.NonNull;
+
 import com.google.gson.annotations.SerializedName;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+
+import sk.uniza.fri.janmokry.karnaughmap.util.GraphicsUtil;
 
 /**
  * Created by Janci on 29.3.2017.
  */
 public class KMapCell {
+
+    public static class ConfigurationShape implements Serializable {
+
+        public final ConfigurationShapes shape;
+        public final @ColorInt int color;
+
+        public ConfigurationShape(@NonNull ConfigurationShapes shape, @ColorInt int color) {
+            this.shape = shape;
+            this.color = GraphicsUtil.getLighterColor(color, 0.7f);
+        }
+    }
 
     public static final int VALUE_0 = 0;
     public static final int VALUE_1 = 1;
@@ -20,6 +40,8 @@ public class KMapCell {
     @SerializedName("bit")
     private int mBitRepresentation;
 
+    private final List<ConfigurationShape> mShapes = new ArrayList<>();
+
     public KMapCell(int value, int bitRepresentation) {
         this.mValue = value;
         this.mBitRepresentation = bitRepresentation;
@@ -31,6 +53,10 @@ public class KMapCell {
 
     public int getValue() {
         return mValue;
+    }
+
+    public int getBitRepresentation() {
+        return mBitRepresentation;
     }
 
     @Override
@@ -45,6 +71,18 @@ public class KMapCell {
             default:
                 throw new IllegalStateException("Unsupported value! " + mBitRepresentation);
         }
+    }
+
+    public void addShape(ConfigurationShape shape) {
+        mShapes.add(shape);
+    }
+
+    public List<ConfigurationShape> getShapes() {
+        return mShapes;
+    }
+
+    public void reset() {
+        mShapes.clear();
     }
 
     private void changeToNextBit() {

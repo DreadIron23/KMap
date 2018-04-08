@@ -1,21 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
-<sk.uniza.fri.janmokry.karnaughmap.view.TwoDScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_height="match_parent"
     android:layout_width="match_parent"
-    android:scrollbars="horizontal|vertical" >
+    tools:context=".fragment.TruthTableFragment">
 
-    <LinearLayout
+    <TextView
+        android:id="@+id/no_data_message"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:padding="16dp"
+        android:text="@string/project_screen_no_table_message" />
+
+    <sk.uniza.fri.janmokry.karnaughmap.view.TwoDScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:scrollbars="horizontal|vertical" >
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="36dp"
-            android:layout_marginLeft="36dp"
-            android:text="Not implemented yet"/>
+        <LinearLayout
+            android:id="@+id/truth_table_container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical" />
 
-    </LinearLayout>
+    </sk.uniza.fri.janmokry.karnaughmap.view.TwoDScrollView>
 
-</sk.uniza.fri.janmokry.karnaughmap.view.TwoDScrollView>
+</FrameLayout>

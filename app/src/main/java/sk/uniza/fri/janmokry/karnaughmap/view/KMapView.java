@@ -4,13 +4,18 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 
+import java.util.List;
+
 import sk.uniza.fri.janmokry.karnaughmap.R;
+import sk.uniza.fri.janmokry.karnaughmap.fragment.KarnaughMapsFragment;
+import sk.uniza.fri.janmokry.karnaughmap.kmap.ConfigurationShapes;
 import sk.uniza.fri.janmokry.karnaughmap.kmap.KMapCell;
 import sk.uniza.fri.janmokry.karnaughmap.kmap.KMapCollection;
 import sk.uniza.fri.janmokry.karnaughmap.util.BitOperationUtil;
@@ -34,6 +39,7 @@ public class KMapView extends View {
 
     private int mCellSizeInPx;
     private KMapCollection mKMapCollection;
+    private KarnaughMapsFragment.OnKMapConfigurationComputationTriggerListener mOnKMapConfigurationTriggerListener;
 
     private Context mContext;
     private Paint mLinePaint = new Paint();
@@ -48,39 +54,30 @@ public class KMapView extends View {
 
     private final int STROKE_WIDTH = 4; // TODO make settable from XML
 
-    public KMapView(Context context) {
+    public KMapView(Context context, @NonNull KarnaughMapsFragment.OnKMapConfigurationComputationTriggerListener listener) {
         super(context);
 
-        init(context, null);
-    }
-
-    public KMapView(Context context, @Nullable AttributeSet attrs) {
-        super(context, attrs);
-
-        init(context, null);
-    }
-
-    public KMapView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
-        super(context, attrs, defStyleAttr);
-
-        init(context, null);
+        init(context, null, listener);
     }
 
     /**
      * @param providedKMapCollection used for loading for now
      */
-    private KMapView(Context context, @Nullable KMapCollection providedKMapCollection) {
+    private KMapView(Context context, @Nullable KMapCollection providedKMapCollection,
+                     @NonNull KarnaughMapsFragment.OnKMapConfigurationComputationTriggerListener listener) {
         super(context);
 
-        init(context, providedKMapCollection);
+        init(context, providedKMapCollection, listener);
     }
 
-    private void init(Context context, @Nullable KMapCollection providedKMapCollection) {
+    private void init(Context context, @Nullable KMapCollection providedKMapCollection,
+                      @NonNull KarnaughMapsFragment.OnKMapConfigurationComputationTriggerListener listener) {
         mContext = context;
+        mOnKMapConfigurationTriggerListener = listener;
         final Resources resources = context.getResources();
 
         mKMapCollection = providedKMapCollection == null ?
-                new KMapCollection(5) : providedKMapCollection;
+                new KMapCollection(4) : providedKMapCollection;
 
         mCellSizeInPx = GraphicsUtil.dpToPx(resources, CELL_SIZE_IN_DP);
 
@@ -102,17 +99,20 @@ public class KMapView extends View {
         return mKMapCollection;
     }
 
-    public static KMapView onLoad(Context context, @NonNull KMapCollection kMapCollection) {
-        return new KMapView(context, kMapCollection);
+    public static KMapView onLoad(Context context, @NonNull KMapCollection kMapCollection,
+                                  KarnaughMapsFragment.OnKMapConfigurationComputationTriggerListener listener) {
+        return new KMapView(context, kMapCollection, listener);
     }
 
     public void addVariable() {
         mKMapCollection.incrementVariable();
+        fireUpConfigurationComputing();
         requestLayout();
     }
 
     public void removeVariable() {
         mKMapCollection.decrementVariable();
+        fireUpConfigurationComputing();
         requestLayout();
     }
 
@@ -145,12 +145,17 @@ public class KMapView extends View {
                 final KMapCell actionUpCell = getCellAtPoint(x, y);
                 if (actionUpCell == mTappedCell && mTappedCell != null && isItTheSameSpot(event)) { // only flipping when tapped
                     mTappedCell.tapped();
+                    fireUpConfigurationComputing();
                     invalidate();
                     return true;
                 }
         }
 
         return super.onTouchEvent(event);
+    }
+
+    private void fireUpConfigurationComputing() {
+        mOnKMapConfigurationTriggerListener.onKMapConfigurationComputationTrigger(mKMapCollection);
     }
 
     private boolean isItTheSameSpot(MotionEvent event) {
@@ -276,11 +281,23 @@ public class KMapView extends View {
         for (int xCoord = leftGridPosition; xCoord < columnSize * mCellSizeInPx + leftGridPosition; xCoord += mCellSizeInPx) {
             int y = 0;
             for (int yCoord = topGridPosition; yCoord < rowSize * mCellSizeInPx + topGridPosition; yCoord += mCellSizeInPx) {
+                final KMapCell kMapCell = mKMapCollection.get(x, y++);
                 canvas.drawText(
-                        mKMapCollection.get(x, y++).toString(),
+                        kMapCell.toString(),
                         xCoord + mCellSizeInPx / 2,
                         yCoord + mCellSizeInPx / 2 - ((mCellValuePaint.descent() + mCellValuePaint.ascent()) / 2),
                         mCellValuePaint);
+                final List<KMapCell.ConfigurationShape> shapes = kMapCell.getShapes();
+                for (KMapCell.ConfigurationShape shape : shapes) {
+                    final ConfigurationShapes shape1 = shape.shape;
+                    final Drawable drawable = shape1.getDrawable(getContext());
+                    if (drawable != null) {
+                        drawable.setColorFilter(shape.color, PorterDuff.Mode.SRC_ATOP);
+                        drawable.setBounds(xCoord, yCoord, xCoord + mCellSizeInPx, yCoord + mCellSizeInPx);
+                        drawable.draw(canvas);
+                    }
+                }
+
             }
             x++;
         }
