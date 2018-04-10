@@ -32,6 +32,8 @@ import static sk.uniza.fri.janmokry.karnaughmap.kmap.KMapCell.VALUE_0_STRING;
 import static sk.uniza.fri.janmokry.karnaughmap.kmap.KMapCell.VALUE_1_STRING;
 
 /**
+ * View representing Truth Table.
+ *
  * Created by Janci on 30.3.2018.
  */
 
@@ -278,7 +280,7 @@ public class TruthTableView extends View {
 
         // draw values
         int valueCounter = 0;
-        for (float yCoord = valueBaseY; yCoord < maximumKMapSize * mCellSizeInPx + valueBaseY; yCoord += mCellSizeInPx) {
+        for (float yCoord = valueBaseY; yCoord < maximumKMapSize * mCellSizeInPx + valueBaseY - 1; yCoord += mCellSizeInPx) {
             canvas.drawText(
                     String.valueOf(valueCounter++),
                     valueBaseX,
@@ -309,9 +311,9 @@ public class TruthTableView extends View {
 
         // draw variable bits
         valueCounter = 0;
-        for (float yCoord = variableBitBaseY; yCoord < maximumKMapSize * mCellSizeInPx + variableBitBaseY; yCoord += mCellSizeInPx) {
+        for (float yCoord = variableBitBaseY; yCoord < maximumKMapSize * mCellSizeInPx + variableBitBaseY - 1; yCoord += mCellSizeInPx) {
             int bitCounter = maximumVariables - 1;
-            for (float xCoord = variableBitBaseX; xCoord < maximumVariables * mCellSizeInPx + variableBitBaseX; xCoord += mCellSizeInPx) {
+            for (float xCoord = variableBitBaseX; xCoord < maximumVariables * mCellSizeInPx + variableBitBaseX - 1; xCoord += mCellSizeInPx) {
                 canvas.drawText(
                         BitOperationUtil.isNthBitSet(valueCounter, bitCounter--) ? VALUE_1_STRING : VALUE_0_STRING,
                         xCoord,
@@ -323,14 +325,14 @@ public class TruthTableView extends View {
 
         // draw map bits
         int collectionCounter = 0;
-        for (float xCoord = mapBitBaseX; xCoord < numberOfMaps * mCellSizeInPx + mapBitBaseX; xCoord += mCellSizeInPx) {
+        for (float xCoord = mapBitBaseX; xCoord < numberOfMaps * mCellSizeInPx + mapBitBaseX - 1; xCoord += mCellSizeInPx) {
 
             final KMapCollection kMapCollection = kMapCollections.get(collectionCounter++);
             final int collectionSize = kMapCollection.getSize();
             final ArrayList<KMapCell> kMapCellList = kMapCollection.getKMapCellList();
             int cellCounter = 0;
 
-            for (float yCoord = mapBitBaseY; yCoord < maximumKMapSize * mCellSizeInPx + mapBitBaseY; yCoord += mCellSizeInPx) {
+            for (float yCoord = mapBitBaseY; yCoord < maximumKMapSize * mCellSizeInPx + mapBitBaseY - 1; yCoord += mCellSizeInPx) {
 
                 canvas.drawText(
                         cellCounter < collectionSize ? kMapCellList.get(cellCounter++).toString() : INVALID_POSITION,
