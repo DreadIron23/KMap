@@ -19,8 +19,15 @@ import static sk.uniza.fri.janmokry.karnaughmap.util.MathUtil.floorMod;
 
 /**
  * Collection holding KMap cells and operations related to them. Data holder for KMap.
+ * This collection is shared with TruthTable.
  */
 public class KMapCollection implements Serializable {
+
+    /** Intended for tap(when bit value changes) change awareness between KMapView and TruthTableView */
+    public interface OnTapListener {
+
+        void onTap(KMapCell cell);
+    }
 
     public static class MinTermsAndDontCares {
 
@@ -41,10 +48,15 @@ public class KMapCollection implements Serializable {
 
     private Solution mSolution;
 
-    private transient ArrayList<KMapCell> mList = new ArrayList<>(NUMBER_OF_CELLS); // TODO: intended for TruthTable linkage
+    private transient ArrayList<KMapCell> mCellList = new ArrayList<>(NUMBER_OF_CELLS);
 
     private int mNumberOfVariables;
     private String mTitle;
+
+    private transient List<OnTapListener> mOnTapListeners = new ArrayList<>();
+
+    private transient OnTapListener mOnTapListener = createOnTapListener();
+
 
     public KMapCollection(int numberOfVariables) {
         if (numberOfVariables > MAX_NUMBER_OF_VARIABLES) {
@@ -55,7 +67,8 @@ public class KMapCollection implements Serializable {
 
         for (int i = 0; i < NUMBER_OF_CELLS; i++) {
             final KMapCell cell = new KMapCell(i, 0);
-            mList.add(cell);
+            cell.setOnTapListener(mOnTapListener);
+            mCellList.add(cell);
 
             final Position position = BitOperationUtil.calculatePosition(i);
             mCells[position.x][position.y] = cell;
@@ -68,6 +81,10 @@ public class KMapCollection implements Serializable {
 
     public int getColumnSize() {
         return 1 << getNumberOfColumnVariables();
+    }
+
+    public int getSize() {
+        return 1 << mNumberOfVariables;
     }
 
     public int getNumberOfRowVariables() {
@@ -86,6 +103,10 @@ public class KMapCollection implements Serializable {
         return mCells[x][y];
     }
 
+    public KMapCell get(int listIndex) {
+        return mCellList.get(listIndex);
+    }
+
     public void incrementVariable() {
         // increment up to max limit of MAX_NUMBER_OF_VARIABLES
         mNumberOfVariables = Math.min(mNumberOfVariables + 1, MAX_NUMBER_OF_VARIABLES);
@@ -102,15 +123,19 @@ public class KMapCollection implements Serializable {
 
     /** Call this after GSON deserialization. It restores instance to correct state */
     public void afterGsonDeserialization() {
-        mList = new ArrayList<>();
+        mOnTapListeners = new ArrayList<>();
+        mOnTapListener = createOnTapListener();
+
+        mCellList = new ArrayList<>();
         for (KMapCell[] column : mCells) {
             for (KMapCell cell : column) {
                 if (cell != null) {
-                    mList.add(cell);
+                    cell.setOnTapListener(mOnTapListener);
+                    mCellList.add(cell);
                 }
             }
         }
-        Collections.sort(mList, (first, second) -> first.getValue() - second.getValue());
+        Collections.sort(mCellList, (first, second) -> first.getValue() - second.getValue());
     }
 
     public void setTitle(String title) {
@@ -124,6 +149,18 @@ public class KMapCollection implements Serializable {
     public void setSolution(@NonNull Solution solution) {
         mSolution = solution;
         prepareCellsForConfigurationDrawing();
+    }
+
+    public void registerOnTapListener(@NonNull OnTapListener onTapListener) {
+        mOnTapListeners.add(onTapListener);
+    }
+
+    public void unregisterOnTapListener(@NonNull OnTapListener onTapListener) {
+        mOnTapListeners.remove(onTapListener);
+    }
+
+    public ArrayList<KMapCell> getKMapCellList() {
+        return mCellList;
     }
 
     public MinTermsAndDontCares getMinTermsAndDontCares() {
@@ -152,7 +189,7 @@ public class KMapCollection implements Serializable {
         if (mSolution.isObsolete(mNumberOfVariables)) {
             return;
         }
-        for (KMapCell cell : mList) {
+        for (KMapCell cell : mCellList) {
             cell.reset();
         }
 
@@ -191,6 +228,15 @@ public class KMapCollection implements Serializable {
                 mCells[position.x][position.y].addShape(new KMapCell.ConfigurationShape(shape, color));
             }
         }
+    }
+
+    @NonNull
+    private OnTapListener createOnTapListener() {
+        return cell -> {
+            for (OnTapListener listener : mOnTapListeners) {
+                listener.onTap(cell);
+            }
+        };
     }
 
     private boolean isWholeRowSet(boolean[][] kMapConfiguration, int nthRow) {

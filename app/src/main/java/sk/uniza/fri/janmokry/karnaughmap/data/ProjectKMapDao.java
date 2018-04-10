@@ -14,7 +14,7 @@ import java.util.List;
 @Dao
 public interface ProjectKMapDao {
 
-    @Query("SELECT * FROM " + ProjectKMap.TABLE_NAME + " WHERE " + ProjectKMap.COLUMN_PROJECT_ID + " = :projectInfoId")
+    @Query("SELECT * FROM " + ProjectKMap.TABLE_NAME + " WHERE " + ProjectKMap.COLUMN_PROJECT_ID + " = :projectInfoId ORDER BY " + ProjectKMap.COLUMN_TITLE)
     LiveData<List<ProjectKMap>> findByProjectInfoId(long projectInfoId);
 
     @Query("DELETE FROM " + ProjectKMap.TABLE_NAME + " WHERE " + ProjectKMap.COLUMN_PROJECT_ID + " = :projectInfoId")

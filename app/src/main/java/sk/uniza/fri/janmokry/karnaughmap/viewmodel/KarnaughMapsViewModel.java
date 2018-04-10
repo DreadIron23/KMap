@@ -14,7 +14,11 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import sk.uniza.fri.janmokry.karnaughmap.algorithm.quinemccluskey.Quine;
 import sk.uniza.fri.janmokry.karnaughmap.algorithm.quinemccluskey.Solution;
+import sk.uniza.fri.janmokry.karnaughmap.data.EventBusService;
+import sk.uniza.fri.janmokry.karnaughmap.data.event.KMapAdditionEvent;
+import sk.uniza.fri.janmokry.karnaughmap.data.event.KMapRemovalEvent;
 import sk.uniza.fri.janmokry.karnaughmap.kmap.KMapCollection;
+import sk.uniza.fri.janmokry.karnaughmap.util.SL;
 import sk.uniza.fri.janmokry.karnaughmap.viewmodel.view.IKarnaughMapsView;
 
 /**
@@ -73,20 +77,14 @@ public class KarnaughMapsViewModel extends ProjectBaseViewModel<IKarnaughMapsVie
 
     private final HashMap<String, KMapConfigurationSolver> mSolvers = new HashMap<>();
 
+    /** Called when KMap is added to fragment */
+    public void onKMapAddition(KMapCollection kMapCollection) {
+        SL.get(EventBusService.class).post(new KMapAdditionEvent(kMapCollection));
+    }
+
     /** Called when KMap is deleted from fragment */
     public void onKMapRemoval(KMapCollection kMapCollection) {
         unregisterKMapFromConfigurationCalculations(kMapCollection);
-
-        if (getView() != null) {
-            getView().getProjectViewModel().onKMapRemoval(kMapCollection);
-        }
-    }
-
-    /** Called when KMap is added to fragment */
-    public void onKMapAddition(KMapCollection kMapCollection) {
-        if (getView() != null) {
-            getView().getProjectViewModel().onKMapAddition(kMapCollection);
-        }
     }
 
     /** Should be called when new KMapView is created */
@@ -101,7 +99,7 @@ public class KarnaughMapsViewModel extends ProjectBaseViewModel<IKarnaughMapsVie
         solver.solution.observe(owner, observer);
     }
 
-    public void onKMapsTitleChange(List<String> oldTitles, List<String> newTitles) {
+    public void onKMapsTitleChange(List<String> oldTitles, List<String> newTitles, KMapCollection removedItem) {
         final ArrayList<KMapConfigurationSolver> solverBuffer = new ArrayList<>();
         for (String oldTitle : oldTitles) {
             solverBuffer.add(mSolvers.remove(oldTitle));
@@ -110,6 +108,9 @@ public class KarnaughMapsViewModel extends ProjectBaseViewModel<IKarnaughMapsVie
         for (int index = 0; index < solverBuffer.size(); index++) {
             mSolvers.put(newTitles.get(index), solverBuffer.get(index));
         }
+
+        // fire event after kmaps have been renamed
+        SL.get(EventBusService.class).post(new KMapRemovalEvent(removedItem));
     }
 
     public void onKMapConfigurationComputationTrigger(KMapCollection collection) {

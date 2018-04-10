@@ -2,6 +2,7 @@ package sk.uniza.fri.janmokry.karnaughmap.kmap;
 
 import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import com.google.gson.annotations.SerializedName;
 
@@ -42,6 +43,9 @@ public class KMapCell {
 
     private final List<ConfigurationShape> mShapes = new ArrayList<>();
 
+    @Nullable
+    private transient KMapCollection.OnTapListener mOnTapListener;
+
     public KMapCell(int value, int bitRepresentation) {
         this.mValue = value;
         this.mBitRepresentation = bitRepresentation;
@@ -49,6 +53,14 @@ public class KMapCell {
 
     public void tapped() {
         changeToNextBit();
+
+        if (mOnTapListener != null) {
+            mOnTapListener.onTap(this);
+        }
+    }
+
+    public void setOnTapListener(@NonNull KMapCollection.OnTapListener listener) {
+        mOnTapListener = listener;
     }
 
     public int getValue() {

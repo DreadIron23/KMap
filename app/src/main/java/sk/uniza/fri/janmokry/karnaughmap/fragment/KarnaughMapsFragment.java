@@ -14,7 +14,10 @@ import butterknife.BindView;
 import butterknife.OnClick;
 import sk.uniza.fri.janmokry.karnaughmap.R;
 import sk.uniza.fri.janmokry.karnaughmap.algorithm.quinemccluskey.Solution;
+import sk.uniza.fri.janmokry.karnaughmap.data.EventBusService;
+import sk.uniza.fri.janmokry.karnaughmap.data.event.KMapVariableCountChangeEvent;
 import sk.uniza.fri.janmokry.karnaughmap.kmap.KMapCollection;
+import sk.uniza.fri.janmokry.karnaughmap.util.SL;
 import sk.uniza.fri.janmokry.karnaughmap.view.KMapItem;
 import sk.uniza.fri.janmokry.karnaughmap.view.KMapView;
 import sk.uniza.fri.janmokry.karnaughmap.viewmodel.KarnaughMapsViewModel;
@@ -65,21 +68,26 @@ public class KarnaughMapsFragment extends ProjectBaseFragment<IKarnaughMapsView,
         getViewModel().onKMapConfigurationComputationTrigger(collection);
     };
 
-    private KMapItem.OnBinClickedListener onBinClickedListener = clickedView -> {
+    private KMapItem.OnBinClickedListener mOnBinClickedListener = clickedView -> {
         new AlertDialog.Builder(getContext(), R.style.DialogStyle)
                 .setTitle(R.string.project_screen_delete_dialog_title)
                 .setMessage(R.string.project_screen_delete_dialog_message)
                 .setPositiveButton(R.string.project_screen_delete_dialog_delete, (dialog, whichButton) -> {
                     removeKMapItem(clickedView);
-                    renameKMapsAccordingToOrder();
+                    renameKMapsAccordingToOrder(clickedView);
                 })
                 .setNegativeButton(R.string.project_screen_delete_dialog_discard, null)
                 .show();
     };
 
+    private KMapItem.OnVariableCountChangeListener mOnVariableCountChangeListener = () -> {
+        SL.get(EventBusService.class).post(new KMapVariableCountChangeEvent());
+    };
+
     private void removeKMapItem(KMapItem itemToRemove) {
         mKMapItemContainer.removeView(itemToRemove);
         mKMapItems.remove(itemToRemove);
+        itemToRemove.onRemoval();
 
         setAddKMapButtonVisibility();
         setNoDataMessageVisibility();
@@ -92,7 +100,7 @@ public class KarnaughMapsFragment extends ProjectBaseFragment<IKarnaughMapsView,
     }
 
     /** This renaming is quite dumb but this is what we have for now */
-    private void renameKMapsAccordingToOrder() {
+    private void renameKMapsAccordingToOrder(KMapItem removedItem) {
         int counter = 0;
         final List<String> oldTitles = new ArrayList<>();
         final List<String> newTitles = new ArrayList<>();
@@ -106,7 +114,7 @@ public class KarnaughMapsFragment extends ProjectBaseFragment<IKarnaughMapsView,
             newTitles.add(newTitle);
         }
 
-        getViewModel().onKMapsTitleChange(oldTitles, newTitles);
+        getViewModel().onKMapsTitleChange(oldTitles, newTitles, removedItem.getKMap().getKMapCollection());
     }
 
     @Override
@@ -123,7 +131,8 @@ public class KarnaughMapsFragment extends ProjectBaseFragment<IKarnaughMapsView,
                 mKMapItems.clear();
                 for (KMapCollection kMapCollection : truthTableCollection.getKMapCollections()) {
                     final KMapItem itemView = new KMapItem(getContext());
-                    itemView.setOnBinClickedListener(onBinClickedListener);
+                    itemView.setOnBinClickedListener(mOnBinClickedListener);
+                    itemView.setOnVariableCountChangeListener(mOnVariableCountChangeListener);
                     final KMapView kMap = KMapView.onLoad(getContext(), kMapCollection,
                             mConfigurationComputationTriggerListener);
                     itemView.addKMap(kMap);
@@ -157,7 +166,8 @@ public class KarnaughMapsFragment extends ProjectBaseFragment<IKarnaughMapsView,
         final String kMapTitle = KMAP_BASE_TITLE + mKMapItems.size();
 
         KMapItem itemView = new KMapItem(getContext());
-        itemView.setOnBinClickedListener(onBinClickedListener);
+        itemView.setOnBinClickedListener(mOnBinClickedListener);
+        itemView.setOnVariableCountChangeListener(mOnVariableCountChangeListener);
         KMapView kMap = new KMapView(getContext(), mConfigurationComputationTriggerListener);
         kMap.setTitle(kMapTitle);
         itemView.addKMap(kMap);

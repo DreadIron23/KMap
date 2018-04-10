@@ -24,7 +24,12 @@ public class KMapItem extends FrameLayout {
 
     public interface OnBinClickedListener {
 
-        void onBinClickedListener(KMapItem clickedView);
+        void onBinClicked(KMapItem clickedView);
+    }
+
+    public interface OnVariableCountChangeListener {
+
+        void onVariableCountChange();
     }
 
     @BindView(R.id.title)
@@ -45,7 +50,10 @@ public class KMapItem extends FrameLayout {
     private KMapView mAttachedKMap;
 
     @Nullable
-    private OnBinClickedListener onBinClickedListener;
+    private OnBinClickedListener mOnBinClickedListener;
+
+    @Nullable
+    private OnVariableCountChangeListener mOnVariableCountChangeListener;
 
     public KMapItem(@NonNull Context context) {
         super(context);
@@ -94,24 +102,38 @@ public class KMapItem extends FrameLayout {
         return mAttachedKMap;
     }
 
-    public void setOnBinClickedListener(@Nullable OnBinClickedListener onBinClickedListener) {
-        this.onBinClickedListener = onBinClickedListener;
+    public void setOnBinClickedListener(@Nullable OnBinClickedListener listener) {
+        this.mOnBinClickedListener = listener;
+    }
+
+    public void setOnVariableCountChangeListener(@Nullable OnVariableCountChangeListener listener) {
+        this.mOnVariableCountChangeListener = listener;
+    }
+
+    public void onRemoval() {
+        mAttachedKMap.onRemoval();
     }
 
     @OnClick(R.id.plus)
     protected void onPlusClicked() {
         mAttachedKMap.addVariable();
+        if (mOnVariableCountChangeListener != null) {
+            mOnVariableCountChangeListener.onVariableCountChange();
+        }
     }
 
     @OnClick(R.id.minus)
     protected void onMinusClicked() {
         mAttachedKMap.removeVariable();
+        if (mOnVariableCountChangeListener != null) {
+            mOnVariableCountChangeListener.onVariableCountChange();
+        }
     }
 
     @OnClick(R.id.bin)
     protected void onBinClicked() {
-        if (onBinClickedListener != null) {
-            onBinClickedListener.onBinClickedListener(this);
+        if (mOnBinClickedListener != null) {
+            mOnBinClickedListener.onBinClicked(this);
         }
     }
 

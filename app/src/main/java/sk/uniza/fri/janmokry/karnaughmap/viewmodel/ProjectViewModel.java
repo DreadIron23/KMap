@@ -56,16 +56,6 @@ public class ProjectViewModel extends ProjectBaseViewModel<IProjectView> {
         mProjectKMaps.observeForever(mProjectKMapsTransformObserver);
     }
 
-
-
-    public void onKMapAddition(KMapCollection kMapCollection) {
-        // TODO: hookup events to TruthTable
-    }
-
-    public void onKMapRemoval(KMapCollection kMapCollection) {
-        // TODO: hookup events to TruthTable
-    }
-
     public void onKarnaughMapsSave(ArrayList<KMapCollection> kMapCollections) {
         SL.get(ProjectKMapManager.class).updateProjectKMapsAsync(
                 mProjectInfo, kMapCollections, () -> {});

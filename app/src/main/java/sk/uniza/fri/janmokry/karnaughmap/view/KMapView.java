@@ -1,5 +1,6 @@
 package sk.uniza.fri.janmokry.karnaughmap.view;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Canvas;
@@ -24,6 +25,7 @@ import sk.uniza.fri.janmokry.karnaughmap.util.GraphicsUtil;
 /**
  * View representing Karnaugh Map.
  */
+@SuppressLint("ViewConstructor")
 public class KMapView extends View {
 
     // Graphically represents variables shown above and left of Karnaugh map.
@@ -35,7 +37,7 @@ public class KMapView extends View {
 
     private final static String TAG = KMapView.class.getSimpleName();
 
-    private static final int CELL_SIZE_IN_DP = 32; // TODO make settable from XML
+    private static final int CELL_SIZE_IN_DP = 32;
 
     private int mCellSizeInPx;
     private KMapCollection mKMapCollection;
@@ -51,8 +53,12 @@ public class KMapView extends View {
     private int mActionDownRawPosX = 0;
     private int mActionDownRawPosY = 0;
     private final int mActionDownPositionTolerance = 10;
+    private final KMapCollection.OnTapListener mOnTapListener = cell -> {
+        invalidate();
+        fireUpConfigurationComputing();
+    };
 
-    private final int STROKE_WIDTH = 4; // TODO make settable from XML
+    private final int STROKE_WIDTH = 4;
 
     public KMapView(Context context, @NonNull KarnaughMapsFragment.OnKMapConfigurationComputationTriggerListener listener) {
         super(context);
@@ -78,11 +84,12 @@ public class KMapView extends View {
 
         mKMapCollection = providedKMapCollection == null ?
                 new KMapCollection(4) : providedKMapCollection;
+        mKMapCollection.registerOnTapListener(mOnTapListener);
 
         mCellSizeInPx = GraphicsUtil.dpToPx(resources, CELL_SIZE_IN_DP);
 
         mLinePaint.setColor(GraphicsUtil.fetchColor(mContext, R.attr.colorPrimary));
-        mLinePaint.setStrokeWidth(STROKE_WIDTH); // TODO make settable from XML
+        mLinePaint.setStrokeWidth(STROKE_WIDTH);
         mLinePaint.setStrokeJoin(Paint.Join.ROUND);
         mLinePaint.setStrokeCap(Paint.Cap.ROUND);
         mLinePaint.setAntiAlias(true);
@@ -145,7 +152,6 @@ public class KMapView extends View {
                 final KMapCell actionUpCell = getCellAtPoint(x, y);
                 if (actionUpCell == mTappedCell && mTappedCell != null && isItTheSameSpot(event)) { // only flipping when tapped
                     mTappedCell.tapped();
-                    fireUpConfigurationComputing();
                     invalidate();
                     return true;
                 }
@@ -165,8 +171,7 @@ public class KMapView extends View {
                 && (int) event.getRawY() > mActionDownRawPosY - mActionDownPositionTolerance;
     }
 
-    @Nullable
-    private KMapCell getCellAtPoint(int x, int y) {
+    private @Nullable KMapCell getCellAtPoint(int x, int y) {
         final int variableWidth = mCellSizeInPx / 3;
 
         final int leftVariablesWidth = variableWidth * (mKMapCollection.getNumberOfRowVariables() + 1);
@@ -177,6 +182,10 @@ public class KMapView extends View {
 
         int lx = x - leftGridPosition;
         int ly = y - topGridPosition;
+
+        if (lx < 0 || ly < 0) { // if lx/ly is between -1 and negative mCellSizeInPx it would pass test
+            return null;
+        }
 
         int row = ly / mCellSizeInPx;
         int column = lx / mCellSizeInPx;
@@ -355,6 +364,17 @@ public class KMapView extends View {
             xCoord += variableWidth;
         }
 
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+
+        onRemoval();
+    }
+
+    public void onRemoval() {
+        mKMapCollection.unregisterOnTapListener(mOnTapListener);
     }
 
     private int[] getNumberOfVariablesPositions(int numberOfVariables) {
