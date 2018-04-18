@@ -1,44 +1,32 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".fragment.AdjustProjectFragment">
+    android:paddingEnd="16dp"
+    android:paddingStart="16dp"
+    android:paddingTop="22dp"
+    android:focusableInTouchMode="true"
+    tools:context=".fragment.AdjustProjectFragment" >
 
-    <LinearLayout
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingLeft="4dp"
+        android:paddingRight="4dp"
+        android:textColor="@color/colorAccent"
+        android:textSize="12sp"
+        android:text="@string/adjust_project_label" />
+
+    <EditText
+        android:id="@+id/project_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:paddingEnd="16dp"
-        android:paddingStart="16dp"
-        android:paddingTop="22dp"
-        android:focusableInTouchMode="true">
+        android:layout_marginBottom="22dp"
+        android:inputType="text"
+        android:paddingBottom="8dp"
+        style="@style/DefaultText"
+        android:hint="@string/adjust_project_hint"
+        tools:text="Sedem segmentovka" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingBottom="8dp"
-            style="@style/DefaultText.Light"
-            android:text="@string/adjust_project_label" />
-
-        <EditText
-            android:id="@+id/project_name"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="22dp"
-            android:inputType="text"
-            android:paddingBottom="8dp"
-            style="@style/DefaultText"
-            android:hint="@string/adjust_project_hint"
-            tools:text="Sedem segmentovka" />
-
-    </LinearLayout>
-
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/confirmation_button"
-        android:layout_width="56dp"
-        android:layout_height="56dp"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="16dp"/>
-
-</FrameLayout>
+</LinearLayout>

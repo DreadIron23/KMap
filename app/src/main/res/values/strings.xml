@@ -45,6 +45,9 @@
     <!-- Logic Expression Editor Screen -->
 
     <string name="logic_expression_editor_screen_duplicate_toast">Implicant je duplicitný a bol zmazaný</string>
-    <string name="logic_expression_editor_screen_menu_item_done_title">Potvrdiť zmeny</string>
+
+    <!-- Menu -->
+
+    <string name="menu_confirm_changes_item_done_title">Potvrdiť zmeny</string>
 
 </resources>

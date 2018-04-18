@@ -3,10 +3,10 @@ package sk.uniza.fri.janmokry.karnaughmap.fragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.view.MenuItem;
 import android.widget.EditText;
 
 import butterknife.BindView;
-import butterknife.OnClick;
 import sk.uniza.fri.janmokry.karnaughmap.R;
 import sk.uniza.fri.janmokry.karnaughmap.activity.ProjectActivity;
 import sk.uniza.fri.janmokry.karnaughmap.data.ProjectInfo;
@@ -35,17 +35,7 @@ public class AdjustProjectFragment extends ProjectBaseFragment<IAdjustProjectVie
 
     @Override
     protected void init() {
-    }
-
-    @OnClick(R.id.confirmation_button)
-    public void onConfirmationButtonClicked() {
-        if (isMessageEmpty()) {
-            mProjectName.setError(getContext().getString(R.string.adjust_project_error_no_name));
-            mProjectName.requestFocus();
-            return;
-        }
-
-        getViewModel().projectNameConfirmed(mProjectName.getText().toString());
+        setHasOptionsMenu(true);
     }
 
     public boolean hasTextChanged() {
@@ -63,7 +53,6 @@ public class AdjustProjectFragment extends ProjectBaseFragment<IAdjustProjectVie
         mProjectName.requestFocus();
     }
 
-
     @Override
     public void setName(String projectName) {
         mProjectName.setText(projectName);
@@ -73,6 +62,27 @@ public class AdjustProjectFragment extends ProjectBaseFragment<IAdjustProjectVie
     public void launchProjectActivity(ProjectInfo projectInfo) {
         final Intent intent = ProjectActivity.newIntent(getContext(), projectInfo);
         startActivity(intent);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_done:
+                onActionDone();
+                return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void onActionDone() {
+        if (isMessageEmpty()) {
+            mProjectName.setError(getContext().getString(R.string.adjust_project_error_no_name));
+            mProjectName.requestFocus();
+            return;
+        }
+
+        getViewModel().projectNameConfirmed(mProjectName.getText().toString());
     }
 
     private boolean isMessageEmpty() {

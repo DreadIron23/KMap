@@ -70,7 +70,7 @@ public class LogicExpressionEditorActivity extends ProjectBaseActivity<IEmptyVie
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_logic_expression_editor, menu);
+        getMenuInflater().inflate(R.menu.menu_confirm_changes, menu);
         return true;
     }
 

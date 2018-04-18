@@ -1,13 +1,13 @@
 package sk.uniza.fri.janmokry.karnaughmap.activity;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
 import android.view.MenuItem;
 
 import sk.uniza.fri.janmokry.karnaughmap.R;
@@ -71,6 +71,12 @@ public class AdjustProjectActivity extends ProjectBaseActivity<IEmptyView, Empty
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_confirm_changes, menu);
+        return true;
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
@@ -87,12 +93,7 @@ public class AdjustProjectActivity extends ProjectBaseActivity<IEmptyView, Empty
         new AlertDialog.Builder(this, R.style.DialogStyle)
                 .setTitle(R.string.adjust_project_screen_delete_dialog_title)
                 .setMessage(R.string.adjust_project_screen_delete_dialog_message)
-                .setPositiveButton(R.string.adjust_project_screen_delete_dialog_logout, new DialogInterface.OnClickListener() {
-
-                    @Override
-                    public void onClick(DialogInterface dialog, int whichButton) {
-                        finish();
-                    }})
+                .setPositiveButton(R.string.adjust_project_screen_delete_dialog_logout, (dialog, whichButton) -> finish())
                 .setNegativeButton(R.string.adjust_project_screen_delete_dialog_discard, null)
                 .show();
     }
