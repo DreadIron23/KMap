@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_height="match_parent"
     android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".fragment.KarnaughMapsFragment">
 
     <TextView
@@ -15,14 +16,17 @@
         android:text="@string/project_screen_no_map_message" />
 
     <sk.uniza.fri.janmokry.karnaughmap.view.TwoDScrollView
+        android:id="@+id/scroll_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:scrollbars="horizontal|vertical" >
+        android:scrollbars="horizontal|vertical"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior" >
 
         <LinearLayout
             android:id="@+id/kmap_item_container"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:animateLayoutChanges="true"
             android:orientation="vertical" />
 
     </sk.uniza.fri.janmokry.karnaughmap.view.TwoDScrollView>

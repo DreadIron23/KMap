@@ -43,4 +43,8 @@ public class GraphicsUtil {
         hsv[1] *= coefficient;
         return Color.HSVToColor(hsv);
     }
+
+    public static @ColorInt int setAlpha(@ColorInt int color, int alpha) {
+        return Color.argb(alpha, Color.red(color), Color.green(color), Color.blue(color));
+    }
 }

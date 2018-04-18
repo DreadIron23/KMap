@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:paddingTop="8dp"
     android:paddingBottom="8dp" >
@@ -20,6 +21,7 @@
             android:gravity="center"
             android:layout_marginLeft="16dp"
             android:layout_marginRight="16dp"
+            android:textSize="20sp"
             tools:text="y1" />
 
         <ImageView
@@ -49,11 +51,62 @@
             android:src="@color/redColor"
             tools:ignore="ContentDescription" />
 
+        <io.supercharge.shimmerlayout.ShimmerLayout
+            android:id="@+id/shimmer"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:padding="8dp"
+            app:shimmer_color="@android:color/white"
+            app:shimmer_gradient_center_color_width="0.5"
+            app:shimmer_mask_width="1"
+            app:shimmer_auto_start="true"
+            android:visibility="gone"
+            tools:visibility="visible" >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:textSize="16sp"
+                android:text="@string/project_screen_computation_in_progress_message" />
+
+        </io.supercharge.shimmerlayout.ShimmerLayout>
+
     </LinearLayout>
 
     <FrameLayout
         android:id="@+id/kmap_item_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
+
+    <!-- We need all ViewGroups in this layout to have layout_width="match_parent" -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+
+        <TextView
+            android:id="@+id/title_expression"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingLeft="16dp"
+            android:paddingStart="16dp"
+            android:textSize="20sp"
+            tools:text="y1 = "
+            tools:ignore="RtlSymmetry" />
+
+        <!-- Dynamically setting width = screen width -->
+        <TextView
+            android:id="@+id/logic_expression"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingRight="8dp"
+            android:paddingEnd="8dp"
+            android:textSize="20sp"
+            tools:textColor="@color/redColor"
+            tools:text="x1x2x3 + x2x4x5"
+            tools:ignore="RtlSymmetry" />
+
+    </LinearLayout>
 
 </LinearLayout>

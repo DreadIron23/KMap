@@ -25,7 +25,7 @@ public abstract class ProjectBaseFragment<T extends IView, R extends AbstractVie
     protected ProjectBaseActivity mActivity;
 
     @Override
-    public View  onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mRootView = inflater.inflate(getLayoutResId(), container, false);
         mUnbinder = ButterKnife.bind(this, mRootView);
         init();

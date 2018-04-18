@@ -3,7 +3,11 @@ package sk.uniza.fri.janmokry.karnaughmap.viewmodel;
 import android.arch.lifecycle.LifecycleOwner;
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.Observer;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+
+import com.squareup.otto.Subscribe;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -17,6 +21,8 @@ import sk.uniza.fri.janmokry.karnaughmap.algorithm.quinemccluskey.Solution;
 import sk.uniza.fri.janmokry.karnaughmap.data.EventBusService;
 import sk.uniza.fri.janmokry.karnaughmap.data.event.KMapAdditionEvent;
 import sk.uniza.fri.janmokry.karnaughmap.data.event.KMapRemovalEvent;
+import sk.uniza.fri.janmokry.karnaughmap.data.event.LogicExpressionEditCompletionEvent;
+import sk.uniza.fri.janmokry.karnaughmap.data.event.TruthTableInvalidateEvent;
 import sk.uniza.fri.janmokry.karnaughmap.kmap.KMapCollection;
 import sk.uniza.fri.janmokry.karnaughmap.util.SL;
 import sk.uniza.fri.janmokry.karnaughmap.viewmodel.view.IKarnaughMapsView;
@@ -77,6 +83,28 @@ public class KarnaughMapsViewModel extends ProjectBaseViewModel<IKarnaughMapsVie
 
     private final HashMap<String, KMapConfigurationSolver> mSolvers = new HashMap<>();
 
+    /** Used when we receive event, we save it to this buffer for processing after save load from DB */
+    @Nullable
+    private LogicExpressionEditCompletionEvent mExpressionEditEventBuffer;
+
+
+    @Override
+    public void onCreate(@Nullable Bundle arguments, @Nullable Bundle savedInstanceState) {
+        super.onCreate(arguments, savedInstanceState);
+
+        SL.get(EventBusService.class).register(this);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+        for (String key : mSolvers.keySet()) {
+            mSolvers.get(key).onDestroy();
+        }
+        SL.get(EventBusService.class).unregister(this);
+    }
+
     /** Called when KMap is added to fragment */
     public void onKMapAddition(KMapCollection kMapCollection) {
         SL.get(EventBusService.class).post(new KMapAdditionEvent(kMapCollection));
@@ -117,12 +145,24 @@ public class KarnaughMapsViewModel extends ProjectBaseViewModel<IKarnaughMapsVie
         mSolvers.get(collection.getTitle()).solve(collection);
     }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
+    @Subscribe
+    public void onLogicExpressionEditCompletion(@NonNull LogicExpressionEditCompletionEvent event) {
+        // save event for later processing
+        mExpressionEditEventBuffer = event;
+    }
 
-        for (String key : mSolvers.keySet()) {
-            mSolvers.get(key).onDestroy();
+    public void onTruthTableCollectionUpdate() {
+        processExpressionEditEventBufferIfNeeded();
+    }
+
+    private void processExpressionEditEventBufferIfNeeded() {
+        if (mExpressionEditEventBuffer != null && getView() != null) {
+            // apply changes
+            getView().applyNewValuesToKMap(mExpressionEditEventBuffer.editedSolution);
+            // notify TruthTable for invalidation
+            SL.get(EventBusService.class).post(new TruthTableInvalidateEvent());
+            // consume the event
+            mExpressionEditEventBuffer = null;
         }
     }
 

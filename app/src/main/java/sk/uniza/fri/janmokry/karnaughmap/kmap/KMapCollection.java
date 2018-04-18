@@ -1,6 +1,7 @@
 package sk.uniza.fri.janmokry.karnaughmap.kmap;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -14,7 +15,9 @@ import sk.uniza.fri.janmokry.karnaughmap.data.ColorPaletteService;
 import sk.uniza.fri.janmokry.karnaughmap.kmap.helper.Position;
 import sk.uniza.fri.janmokry.karnaughmap.util.BitOperationUtil;
 import sk.uniza.fri.janmokry.karnaughmap.util.SL;
+import sk.uniza.fri.janmokry.karnaughmap.util.SpanUtil;
 
+import static sk.uniza.fri.janmokry.karnaughmap.kmap.KMapCell.VALUE_1;
 import static sk.uniza.fri.janmokry.karnaughmap.util.MathUtil.floorMod;
 
 /**
@@ -46,6 +49,8 @@ public class KMapCollection implements Serializable {
     // as for now, we support Karnaugh Map up to 8 variables, i.e. 4x4, 16x16 dimensions respectively
     private final KMapCell[][] mCells = new KMapCell[16][16]; //columns, rows
 
+    /** Null if never calculated - newly created KMap. */
+    @Nullable
     private Solution mSolution;
 
     private transient ArrayList<KMapCell> mCellList = new ArrayList<>(NUMBER_OF_CELLS);
@@ -146,9 +151,20 @@ public class KMapCollection implements Serializable {
         return mTitle;
     }
 
+    public CharSequence getSpannedTitle() {
+        return SpanUtil.spanVariableName(mTitle);
+    }
+
     public void setSolution(@NonNull Solution solution) {
         mSolution = solution;
         prepareCellsForConfigurationDrawing();
+    }
+
+    public @NonNull Solution getSolution() {
+        if (mSolution == null) {
+            return new Solution(mTitle);
+        }
+        return mSolution;
     }
 
     public void registerOnTapListener(@NonNull OnTapListener onTapListener) {
@@ -190,7 +206,7 @@ public class KMapCollection implements Serializable {
             return;
         }
         for (KMapCell cell : mCellList) {
-            cell.reset();
+            cell.clearShapes();
         }
 
         final int[] colorPalette = SL.get(ColorPaletteService.class).providePaletteFor(mSolution.getSolution().size());
@@ -251,5 +267,20 @@ public class KMapCollection implements Serializable {
             if (!value) return false;
         }
         return true;
+    }
+
+    public void applyChangesFromEditedSolution(@NonNull Solution editedSolution) {
+        for (KMapCell cell : mCellList) {
+            cell.reset();
+        }
+
+        for (Number configuration : editedSolution.getSolution()) {
+            final List<Integer> allCoveredMinTerms = configuration.getAllCoveredMinTerms();
+
+            for (Integer coveredMinTerm : allCoveredMinTerms) { // set kMapConfiguration
+                final Position position = BitOperationUtil.calculatePosition(coveredMinTerm);
+                mCells[position.x][position.y].setBit(VALUE_1);
+            }
+        }
     }
 }

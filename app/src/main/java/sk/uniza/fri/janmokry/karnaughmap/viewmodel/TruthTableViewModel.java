@@ -9,6 +9,7 @@ import sk.uniza.fri.janmokry.karnaughmap.data.EventBusService;
 import sk.uniza.fri.janmokry.karnaughmap.data.event.KMapAdditionEvent;
 import sk.uniza.fri.janmokry.karnaughmap.data.event.KMapRemovalEvent;
 import sk.uniza.fri.janmokry.karnaughmap.data.event.KMapVariableCountChangeEvent;
+import sk.uniza.fri.janmokry.karnaughmap.data.event.TruthTableInvalidateEvent;
 import sk.uniza.fri.janmokry.karnaughmap.util.SL;
 import sk.uniza.fri.janmokry.karnaughmap.viewmodel.view.ITruthTableView;
 
@@ -49,6 +50,13 @@ public class TruthTableViewModel extends ProjectBaseViewModel<ITruthTableView> {
     public void onKMapVariableCountChange(KMapVariableCountChangeEvent event) {
         if (getView() != null) {
             getView().layoutTruthTable();
+        }
+    }
+
+    @Subscribe
+    public void onInvalidationEvent(TruthTableInvalidateEvent event) {
+        if (getView() != null) {
+            getView().invalidate();
         }
     }
 }

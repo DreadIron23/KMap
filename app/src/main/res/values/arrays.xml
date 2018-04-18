@@ -27,12 +27,11 @@
         <item>@color/dark_olive_green</item>
     </integer-array>
 
-    <!-- Boynton's 9 maximum contrast colors -->
-    <integer-array name="palette_of_9_colors" >
+    <!-- Boynton's 8 maximum contrast colors -->
+    <integer-array name="palette_of_8_colors" >
         <item>@color/blue</item>
         <item>@color/red</item>
         <item>@color/green</item>
-        <item>@color/yellow</item>
         <item>@color/magenta</item>
         <item>@color/pink</item>
         <item>@color/gray</item>

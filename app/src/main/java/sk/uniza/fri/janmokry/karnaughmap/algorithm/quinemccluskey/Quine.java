@@ -109,7 +109,9 @@ public class Quine {
 
             if (mAlgorithmStopper.isDisposed()) {
                 logOnDisposeEvent(startTime, System.currentTimeMillis());
-                return new Solution(null);
+
+                final List<Number> nullList = null;
+                return new Solution(nullList);
             }
 
         } while (merged);
@@ -162,7 +164,9 @@ public class Quine {
 
             if (mAlgorithmStopper.isDisposed()) {
                 logOnDisposeEvent(startTime, System.currentTimeMillis());
-                return new Solution(null);
+
+                final List<Number> nullList = null;
+                return new Solution(nullList);
             }
 
             //  end loop

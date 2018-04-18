@@ -24,7 +24,8 @@ public class KMapCell {
 
         public ConfigurationShape(@NonNull ConfigurationShapes shape, @ColorInt int color) {
             this.shape = shape;
-            this.color = GraphicsUtil.getLighterColor(color, 0.7f);
+            final int alpha70percent = 178;
+            this.color = GraphicsUtil.setAlpha(color, alpha70percent);
         }
     }
 
@@ -93,8 +94,18 @@ public class KMapCell {
         return mShapes;
     }
 
-    public void reset() {
+    public void clearShapes() {
         mShapes.clear();
+    }
+
+    /** Resets shapes and sets bit to VALUE_0 */
+    public void reset() {
+        clearShapes();
+        mBitRepresentation = VALUE_0;
+    }
+
+    public void setBit(int bit) {
+        mBitRepresentation = bit;
     }
 
     private void changeToNextBit() {

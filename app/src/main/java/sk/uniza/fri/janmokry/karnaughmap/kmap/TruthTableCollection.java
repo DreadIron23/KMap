@@ -79,7 +79,6 @@ public class TruthTableCollection {
     public void removeOnTapListener() {
         if (mOnTapListener != null) {
             unregisterOnTapListener();
-            mOnTapListener = null;
         }
     }
 

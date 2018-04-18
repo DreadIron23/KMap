@@ -7,6 +7,7 @@
     <string name="title_activity_list_od_projects">Zoznam projektov</string>
     <string name="title_activity_adjust_project">Nový projekt</string>
     <string name="title_activity_adjust_project_edit_mode">Editovať projekt</string>
+    <string name="title_activity_logic_expression_editor">Editácia log. výrazu</string>
 
     <!-- Adjust projects -->
 
@@ -39,5 +40,11 @@
     <string name="project_screen_delete_dialog_delete">zahodiť</string>
     <string name="project_screen_delete_dialog_discard">zrušiť</string>
     <string name="project_screen_toast_deleted_kmap">Mapa %s vymazaná\nMapy boli premenované podľa poradia</string>
+    <string name="project_screen_computation_in_progress_message">prebieha výpočet…</string>
+
+    <!-- Logic Expression Editor Screen -->
+
+    <string name="logic_expression_editor_screen_duplicate_toast">Implicant je duplicitný a bol zmazaný</string>
+    <string name="logic_expression_editor_screen_menu_item_done_title">Potvrdiť zmeny</string>
 
 </resources>

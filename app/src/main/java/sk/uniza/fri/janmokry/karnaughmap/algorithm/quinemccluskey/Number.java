@@ -1,5 +1,8 @@
 package sk.uniza.fri.janmokry.karnaughmap.algorithm.quinemccluskey;
 
+import android.support.annotation.NonNull;
+
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,9 +14,18 @@ import sk.uniza.fri.janmokry.karnaughmap.util.BitOperationUtil;
  *
  * Created by Johny on 28.1.2017.
  */
-public class Number {
+public class Number implements Serializable {
 
     public static final Integer COMBINED_VALUE = 2;
+
+    /** Factory method. Sets all values to COMBINED_VALUE */
+    public static Number getBlankNumber(int numberOfVariables) {
+        final ArrayList<Integer> blankNumber = new ArrayList<>(numberOfVariables);
+        for (int index = 0; index < numberOfVariables; index++) {
+            blankNumber.add(COMBINED_VALUE);
+        }
+        return new Number(blankNumber);
+    }
 
     public ArrayList<Integer> mNumber = new ArrayList<>();
 
@@ -91,7 +103,22 @@ public class Number {
         return mNumber.toString();
     }
 
-    /** Returns all minTerns which are covered in this configuration (in Solution) */
+    public boolean isCoveringWholeMap() {
+        for (Integer bit : mNumber) {
+            if (!bit.equals(COMBINED_VALUE)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public void coverWholeMap() {
+        for (int index = 0; index < mNumber.size(); index++) {
+            mNumber.set(index, COMBINED_VALUE);
+        }
+    }
+
+    /** Returns all minTerms which are covered in this configuration (in Solution) */
     public List<Integer> getAllCoveredMinTerms() {
         final ArrayList<Integer> minTerms = new ArrayList<>();
         final int combinedBits = getNumberOfCombinedBits(mNumber);
@@ -122,5 +149,13 @@ public class Number {
             }
         }
         return counter;
+    }
+
+    public int getXthBit(int index) {
+        return mNumber.get(mNumber.size() - 1 - index);
+    }
+
+    public void setXthBit(int index, @NonNull Integer value) {
+        mNumber.set(mNumber.size() - 1 - index, value);
     }
 }

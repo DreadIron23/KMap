@@ -18,6 +18,8 @@ import sk.uniza.fri.janmokry.karnaughmap.view.NonSwipeableViewPager;
 import sk.uniza.fri.janmokry.karnaughmap.viewmodel.ProjectViewModel;
 import sk.uniza.fri.janmokry.karnaughmap.viewmodel.view.IProjectView;
 
+import static android.content.res.Configuration.ORIENTATION_LANDSCAPE;
+
 /**
  * View logic
  */
@@ -69,6 +71,9 @@ public class ProjectFragment extends ProjectBaseFragment<IProjectView, ProjectVi
         final ActionBar supportActionBar = projectBaseActivity.getSupportActionBar();
         if (supportActionBar != null) {
             supportActionBar.setDisplayHomeAsUpEnabled(true);
+            if (getResources().getConfiguration().orientation == ORIENTATION_LANDSCAPE) {
+                supportActionBar.hide();
+            }
         }
 
         final ProjectInfo projectInfo = (ProjectInfo) getArguments().getSerializable(ARG_PROJECT_INFO);

@@ -7,4 +7,5 @@ public interface ITruthTableView extends IBaseProjectView {
     void onKMapAddition(KMapCollection collection);
     void onKMapRemoval(KMapCollection collection);
     void layoutTruthTable();
+    void invalidate();
 }

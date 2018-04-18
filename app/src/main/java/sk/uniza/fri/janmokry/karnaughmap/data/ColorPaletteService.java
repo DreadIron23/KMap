@@ -14,17 +14,17 @@ import sk.uniza.fri.janmokry.karnaughmap.util.SL;
 
 public class ColorPaletteService implements SL.IService {
 
-    private final @ColorInt int[] mPalette9;
+    private final @ColorInt int[] mPalette8;
     private final @ColorInt int[] mPalette20;
 
     public ColorPaletteService(Context context) {
-        mPalette9 = context.getResources().getIntArray(R.array.palette_of_9_colors);
+        mPalette8 = context.getResources().getIntArray(R.array.palette_of_8_colors);
         mPalette20 = context.getResources().getIntArray(R.array.palette_of_20_colors);
     }
 
     public int[] providePaletteFor(int numberOfItems) {
-        if (numberOfItems <= mPalette9.length) {
-            return mPalette9;
+        if (numberOfItems <= mPalette8.length) {
+            return mPalette8;
         }
         return mPalette20;
     }

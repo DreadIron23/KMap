@@ -1,6 +1,10 @@
 package sk.uniza.fri.janmokry.karnaughmap.fragment;
 
+import android.animation.ObjectAnimator;
 import android.arch.lifecycle.Observer;
+import android.os.Handler;
+import android.os.Looper;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
 import android.view.View;
@@ -13,6 +17,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.OnClick;
 import sk.uniza.fri.janmokry.karnaughmap.R;
+import sk.uniza.fri.janmokry.karnaughmap.activity.LogicExpressionEditorActivity;
 import sk.uniza.fri.janmokry.karnaughmap.algorithm.quinemccluskey.Solution;
 import sk.uniza.fri.janmokry.karnaughmap.data.EventBusService;
 import sk.uniza.fri.janmokry.karnaughmap.data.event.KMapVariableCountChangeEvent;
@@ -20,6 +25,7 @@ import sk.uniza.fri.janmokry.karnaughmap.kmap.KMapCollection;
 import sk.uniza.fri.janmokry.karnaughmap.util.SL;
 import sk.uniza.fri.janmokry.karnaughmap.view.KMapItem;
 import sk.uniza.fri.janmokry.karnaughmap.view.KMapView;
+import sk.uniza.fri.janmokry.karnaughmap.view.TwoDScrollView;
 import sk.uniza.fri.janmokry.karnaughmap.viewmodel.KarnaughMapsViewModel;
 import sk.uniza.fri.janmokry.karnaughmap.viewmodel.ProjectViewModel;
 import sk.uniza.fri.janmokry.karnaughmap.viewmodel.view.IKarnaughMapsView;
@@ -31,6 +37,7 @@ public class KarnaughMapsFragment extends ProjectBaseFragment<IKarnaughMapsView,
 
     private static final int MAX_ALLOWED_KMAPS = 8;
     private static final String KMAP_BASE_TITLE = "y";
+    private static final long SCROLLING_DURATION = 500L;
 
     public static KarnaughMapsFragment newInstance() {
         return new KarnaughMapsFragment();
@@ -40,6 +47,9 @@ public class KarnaughMapsFragment extends ProjectBaseFragment<IKarnaughMapsView,
 
         void onKMapConfigurationComputationTrigger(KMapCollection collection);
     }
+
+    @BindView(R.id.scroll_view)
+    protected TwoDScrollView mTwoDScrollView;
 
     @BindView(R.id.kmap_item_container)
     protected LinearLayout mKMapItemContainer;
@@ -52,6 +62,8 @@ public class KarnaughMapsFragment extends ProjectBaseFragment<IKarnaughMapsView,
 
     private List<KMapItem> mKMapItems = new ArrayList<>();
 
+    private final Handler mHandler = new Handler(Looper.getMainLooper());
+
     private final Observer<Solution> mSolutionObserver = solution -> {
         if (solution != null) {
             for (KMapItem kMapItem : mKMapItems) {
@@ -59,6 +71,7 @@ public class KarnaughMapsFragment extends ProjectBaseFragment<IKarnaughMapsView,
                 if (kMap.getTitle().equals(solution.getTitle())) {
                     kMap.getKMapCollection().setSolution(solution);
                     kMap.invalidate();
+                    kMapItem.onComputationDone(solution);
                 }
             }
         }
@@ -66,6 +79,12 @@ public class KarnaughMapsFragment extends ProjectBaseFragment<IKarnaughMapsView,
 
     private final OnKMapConfigurationComputationTriggerListener mConfigurationComputationTriggerListener = collection -> {
         getViewModel().onKMapConfigurationComputationTrigger(collection);
+        for (KMapItem item : mKMapItems) {
+            if (item.getKMap().getKMapCollection() == collection) {
+                item.onComputationKickOf();
+                break;
+            }
+        }
     };
 
     private KMapItem.OnBinClickedListener mOnBinClickedListener = clickedView -> {
@@ -83,6 +102,11 @@ public class KarnaughMapsFragment extends ProjectBaseFragment<IKarnaughMapsView,
     private KMapItem.OnVariableCountChangeListener mOnVariableCountChangeListener = () -> {
         SL.get(EventBusService.class).post(new KMapVariableCountChangeEvent());
     };
+
+    private KMapItem.OnLogicExpressionClickedListener mOnLogicExpressionClickedListener =
+            (solution, numberOfVariables) ->
+                    getActivity().startActivity(LogicExpressionEditorActivity
+                            .newIntent(getContext(), solution, numberOfVariables));
 
     private void removeKMapItem(KMapItem itemToRemove) {
         mKMapItemContainer.removeView(itemToRemove);
@@ -133,6 +157,7 @@ public class KarnaughMapsFragment extends ProjectBaseFragment<IKarnaughMapsView,
                     final KMapItem itemView = new KMapItem(getContext());
                     itemView.setOnBinClickedListener(mOnBinClickedListener);
                     itemView.setOnVariableCountChangeListener(mOnVariableCountChangeListener);
+                    itemView.setOnLogicExpressionClickedListener(mOnLogicExpressionClickedListener);
                     final KMapView kMap = KMapView.onLoad(getContext(), kMapCollection,
                             mConfigurationComputationTriggerListener);
                     itemView.addKMap(kMap);
@@ -144,6 +169,9 @@ public class KarnaughMapsFragment extends ProjectBaseFragment<IKarnaughMapsView,
                 }
 
                 setNoDataMessageVisibility();
+                setAddKMapButtonVisibility();
+
+                getViewModel().onTruthTableCollectionUpdate();
             }
         });
     }
@@ -168,6 +196,7 @@ public class KarnaughMapsFragment extends ProjectBaseFragment<IKarnaughMapsView,
         KMapItem itemView = new KMapItem(getContext());
         itemView.setOnBinClickedListener(mOnBinClickedListener);
         itemView.setOnVariableCountChangeListener(mOnVariableCountChangeListener);
+        itemView.setOnLogicExpressionClickedListener(mOnLogicExpressionClickedListener);
         KMapView kMap = new KMapView(getContext(), mConfigurationComputationTriggerListener);
         kMap.setTitle(kMapTitle);
         itemView.addKMap(kMap);
@@ -175,6 +204,13 @@ public class KarnaughMapsFragment extends ProjectBaseFragment<IKarnaughMapsView,
 
         mKMapItemContainer.addView(itemView);
         mKMapItems.add(itemView);
+
+        mHandler.post(() -> { // scroll to newly created map
+            ObjectAnimator.ofInt(mTwoDScrollView, "scrollY", (int) itemView.getY())
+                    .setDuration(SCROLLING_DURATION).start();
+            ObjectAnimator.ofInt(mTwoDScrollView, "scrollX", (int) itemView.getX())
+                    .setDuration(SCROLLING_DURATION).start();
+        });
 
         setAddKMapButtonVisibility();
         setNoDataMessageVisibility();
@@ -193,5 +229,18 @@ public class KarnaughMapsFragment extends ProjectBaseFragment<IKarnaughMapsView,
     @Override
     public ProjectViewModel getProjectViewModel() {
         return ((ProjectFragment) getParentFragment()).getViewModel();
+    }
+
+    @Override
+    public void applyNewValuesToKMap(@NonNull Solution editedSolution) {
+        for (KMapItem kMapItem : mKMapItems) {
+            final KMapView kMap = kMapItem.getKMap();
+            if (kMap.getTitle().equals(editedSolution.getTitle())) {
+                kMap.getKMapCollection().applyChangesFromEditedSolution(editedSolution);
+                kMap.invalidate();
+                // compute configurations for new values
+                getViewModel().onKMapConfigurationComputationTrigger(kMap.getKMapCollection());
+            }
+        }
     }
 }

@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#3F51B5</color>
-    <color name="colorPrimaryDark">#303F9F</color>
-    <color name="colorAccent">#3F51B5</color>
+    <color name="colorPrimary">#292929</color>
+    <color name="colorPrimaryDark">#000000</color>
+    <color name="colorAccent">#00bf95</color>
 
     <color name="colorGray">#BDBDBD</color>
     <color name="lighterTextColor">#9B9B9B</color>
     <color name="redColor">#F44336</color>
+    <color name="selected_background">#C8C8C8</color>
+    <color name="background_color">#FAFAFA</color>
 
     <!-- Kelly's 20 maximum contrast colors
          see https://stackoverflow.com/a/4382138
@@ -32,11 +34,10 @@
     <color name="vivid_reddish_orange">#F13A13</color>
     <color name="dark_olive_green">#232C16</color>
 
-    <!-- Boynton's 9 maximum contrast colors -->
+    <!-- Boynton's 8 maximum contrast colors -->
     <color name="blue">#0000FF</color>
     <color name="red">#FF0000</color>
     <color name="green">#00FF00</color>
-    <color name="yellow">#FFFF00</color>
     <color name="magenta">#FF00FF</color>
     <color name="pink">#FF8080</color>
     <color name="gray">#808080</color>

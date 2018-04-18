@@ -43,7 +43,6 @@ public class AdjustProjectActivity extends ProjectBaseActivity<IEmptyView, Empty
 
     @Override
     protected void init(Bundle savedInstanceState) {
-        setContentView(R.layout.activity_adjust_project);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         if (getSupportActionBar() != null) {

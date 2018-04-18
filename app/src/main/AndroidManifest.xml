@@ -39,6 +39,10 @@
                 android:value="sk.uniza.fri.janmokry.karnaughmap.activity.ListOfProjectsActivity" />
         </activity>
 
+        <activity
+            android:name=".activity.LogicExpressionEditorActivity"
+            android:theme="@style/AppTheme" />
+
     </application>
 
 </manifest>

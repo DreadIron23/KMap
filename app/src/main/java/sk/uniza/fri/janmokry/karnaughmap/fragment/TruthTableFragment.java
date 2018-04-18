@@ -53,6 +53,12 @@ public class TruthTableFragment extends ProjectBaseFragment<ITruthTableView, Tru
 
     @Override
     public void onKMapAddition(KMapCollection collection) {
+        if (mTruthTableView == null) {
+            // this is case when user clicked add map button before the maps loaded from database.
+            // We ignore it because the created map/maps are disposed in process.
+            return;
+        }
+
         if (mTruthTableView.isEmpty()) {
             showTable();
         }
@@ -70,6 +76,11 @@ public class TruthTableFragment extends ProjectBaseFragment<ITruthTableView, Tru
     @Override
     public void layoutTruthTable() {
         mTruthTableView.requestLayout();
+    }
+
+    @Override
+    public void invalidate() {
+        mTruthTableView.invalidate();
     }
 
     private void showTable() {
