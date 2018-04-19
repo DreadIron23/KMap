@@ -8,7 +8,7 @@ import sk.uniza.fri.janmokry.karnaughmap.activity.AdjustProjectActivity;
 import sk.uniza.fri.janmokry.karnaughmap.data.EventBusService;
 import sk.uniza.fri.janmokry.karnaughmap.data.ProjectInfo;
 import sk.uniza.fri.janmokry.karnaughmap.data.ProjectInfoManager;
-import sk.uniza.fri.janmokry.karnaughmap.data.event.RefreshListOfProjectsContentEvent;
+import sk.uniza.fri.janmokry.karnaughmap.data.event.ProjectNameChangeEvent;
 import sk.uniza.fri.janmokry.karnaughmap.util.SL;
 import sk.uniza.fri.janmokry.karnaughmap.viewmodel.view.IAdjustProjectView;
 
@@ -51,13 +51,13 @@ public class AdjustProjectViewModel extends ProjectBaseViewModel<IAdjustProjectV
                     } else {
                         if (isEditMode()) {
                             projectInfoManager.updateProjectNameAsync(mEditingProjectInfo, newProjectName, () -> {
-                                        SL.get(EventBusService.class).post(new RefreshListOfProjectsContentEvent());
+                                        SL.get(EventBusService.class).post(new ProjectNameChangeEvent(newProjectName));
                                         finishView();
                                     });
                         } else {
                             projectInfoManager.insertAsync(new ProjectInfo(newProjectName), insertedId -> {
                                         launchProjectActivity(new ProjectInfo(insertedId, newProjectName));
-                                        SL.get(EventBusService.class).post(new RefreshListOfProjectsContentEvent());
+                                        SL.get(EventBusService.class).post(new ProjectNameChangeEvent(newProjectName));
                                         finishView();
                                     });
                         }

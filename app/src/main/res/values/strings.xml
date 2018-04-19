@@ -49,5 +49,7 @@
     <!-- Menu -->
 
     <string name="menu_confirm_changes_item_done_title">Potvrdiť zmeny</string>
+    <string name="menu_project_screen_item_export_title">Exportovať projekt</string>
+    <string name="menu_project_screen_item_edit_title">Editovať projekt</string>
 
 </resources>

@@ -3,6 +3,7 @@ package sk.uniza.fri.janmokry.karnaughmap.activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.Menu;
 import android.view.Window;
 import android.view.WindowManager;
 
@@ -54,5 +55,11 @@ public class ProjectActivity extends ProjectBaseActivity<IEmptyView, EmptyViewMo
             getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                     WindowManager.LayoutParams.FLAG_FULLSCREEN);
         }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_project_screen, menu);
+        return true;
     }
 }

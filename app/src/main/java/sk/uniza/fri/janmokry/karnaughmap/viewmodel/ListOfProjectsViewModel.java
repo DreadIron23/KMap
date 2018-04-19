@@ -12,7 +12,7 @@ import sk.uniza.fri.janmokry.karnaughmap.data.EventBusService;
 import sk.uniza.fri.janmokry.karnaughmap.data.ProjectInfo;
 import sk.uniza.fri.janmokry.karnaughmap.data.ProjectInfoManager;
 import sk.uniza.fri.janmokry.karnaughmap.data.ProjectKMapManager;
-import sk.uniza.fri.janmokry.karnaughmap.data.event.RefreshListOfProjectsContentEvent;
+import sk.uniza.fri.janmokry.karnaughmap.data.event.ProjectNameChangeEvent;
 import sk.uniza.fri.janmokry.karnaughmap.util.SL;
 import sk.uniza.fri.janmokry.karnaughmap.viewmodel.view.IListOfProjectsView;
 
@@ -49,7 +49,7 @@ public class ListOfProjectsViewModel extends ProjectBaseViewModel<IListOfProject
     }
 
     @Subscribe
-    public void onRefreshListOfProjectsContentPosted(RefreshListOfProjectsContentEvent event) {
+    public void onRefreshListOfProjectsContentPosted(ProjectNameChangeEvent event) {
         initProjectNames();
         setDataToView();
     }

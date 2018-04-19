@@ -25,31 +25,33 @@
             tools:text="y1" />
 
         <ImageView
-            android:id="@+id/minus"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_gravity="center_vertical"
-            android:padding="8dp"
-            android:src="@color/colorPrimary"
-            tools:ignore="ContentDescription" />
-
-        <ImageView
             android:id="@+id/plus"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_gravity="center_vertical"
             android:padding="8dp"
-            android:src="@color/colorPrimary"
+            android:src="@drawable/ic_add_circle"
             tools:ignore="ContentDescription" />
+
+        <ImageView
+            android:id="@+id/minus"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="8dp"
+            android:padding="8dp"
+            android:src="@drawable/ic_minus_circle"
+            tools:ignore="ContentDescription,RtlHardcoded" />
 
         <ImageView
             android:id="@+id/bin"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_gravity="center_vertical"
+            android:layout_marginLeft="8dp"
             android:padding="8dp"
-            android:src="@color/redColor"
-            tools:ignore="ContentDescription" />
+            android:src="@drawable/ic_remove_circle"
+            tools:ignore="ContentDescription,RtlHardcoded" />
 
         <io.supercharge.shimmerlayout.ShimmerLayout
             android:id="@+id/shimmer"

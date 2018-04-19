@@ -6,7 +6,7 @@
 
     <item
         android:id="@+id/action_done"
-        android:orderInCategory="1"
+        android:orderInCategory="10"
         android:title="@string/menu_confirm_changes_item_done_title"
         android:icon="@drawable/ic_done"
         app:showAsAction="always"/>

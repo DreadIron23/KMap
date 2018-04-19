@@ -6,14 +6,18 @@ import android.arch.lifecycle.Observer;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 
+import com.squareup.otto.Subscribe;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import io.reactivex.Completable;
 import io.reactivex.schedulers.Schedulers;
+import sk.uniza.fri.janmokry.karnaughmap.data.EventBusService;
 import sk.uniza.fri.janmokry.karnaughmap.data.ProjectInfo;
 import sk.uniza.fri.janmokry.karnaughmap.data.ProjectKMap;
 import sk.uniza.fri.janmokry.karnaughmap.data.ProjectKMapManager;
+import sk.uniza.fri.janmokry.karnaughmap.data.event.ProjectNameChangeEvent;
 import sk.uniza.fri.janmokry.karnaughmap.kmap.KMapCollection;
 import sk.uniza.fri.janmokry.karnaughmap.kmap.TruthTableCollection;
 import sk.uniza.fri.janmokry.karnaughmap.util.ConversionUtil;
@@ -46,6 +50,7 @@ public class ProjectViewModel extends ProjectBaseViewModel<IProjectView> {
     @Override
     public void onCreate(Bundle arguments, @Nullable Bundle savedInstanceState) {
         super.onCreate(arguments, savedInstanceState);
+        SL.get(EventBusService.class).register(this);
         mProjectInfo = (ProjectInfo) arguments.getSerializable(ARG_PROJECT_INFO);
 
         loadData();
@@ -66,5 +71,13 @@ public class ProjectViewModel extends ProjectBaseViewModel<IProjectView> {
         super.onDestroy();
 
         mProjectKMaps.removeObserver(mProjectKMapsTransformObserver);
+        SL.get(EventBusService.class).unregister(this);
+    }
+
+    @Subscribe
+    public void onProjectNameChangeEvent(ProjectNameChangeEvent event) {
+        if (getView() != null) {
+            getView().setTitle(event.newProjectName);
+        }
     }
 }

@@ -45,7 +45,7 @@ public class TruthTableView extends View {
     private static final int CELL_SIZE_IN_DP = 32;
     private static final int VALUE_CELL_SIZE_IN_DP = CELL_SIZE_IN_DP * 2;
     private static final int BORDER_OFFSET_IN_DP = 16; // effectively padding
-    private static final int STROKE_WIDTH = 4;
+    private static final int STROKE_WIDTH_IN_DP = 1;
     private static final String INVALID_POSITION = "\u2014"; // long dash
 
     private int mCellSizeInPx;
@@ -89,18 +89,19 @@ public class TruthTableView extends View {
         mValueCellSizeInPx = GraphicsUtil.dpToPx(resources, VALUE_CELL_SIZE_IN_DP);
         mBorderOffsetInPx = GraphicsUtil.dpToPx(resources, BORDER_OFFSET_IN_DP);
 
-        mLinePaint.setColor(GraphicsUtil.fetchColor(mContext, R.attr.colorPrimary));
-        mLinePaint.setStrokeWidth(STROKE_WIDTH);
+        mLinePaint.setColor(getResources().getColor(R.color.lighterTextColor));
+        mLinePaint.setStrokeWidth(GraphicsUtil.dpToPx(getResources(), STROKE_WIDTH_IN_DP));
         mLinePaint.setStrokeJoin(Paint.Join.ROUND);
         mLinePaint.setStrokeCap(Paint.Cap.ROUND);
         mLinePaint.setAntiAlias(true);
 
         mThickLinePaint = new Paint(mLinePaint);
         mThickLinePaint.setStrokeCap(Paint.Cap.BUTT);
-        mThickLinePaint.setStrokeWidth(STROKE_WIDTH * 2);
+        mThickLinePaint.setStrokeWidth(GraphicsUtil.dpToPx(getResources(), STROKE_WIDTH_IN_DP * 2));
 
         mCellValuePaint.setTextSize(mCellSizeInPx / 1.3f);
         mCellValuePaint.setTextAlign(Paint.Align.CENTER);
+        mCellValuePaint.setColor(GraphicsUtil.fetchColor(getContext(), R.attr.colorPrimary));
         mCellValuePaint.setAntiAlias(true);
 
         mSpannedHashSign = new SpannableString("#");
@@ -115,7 +116,7 @@ public class TruthTableView extends View {
         mMapLabelBuilder.setSpan(Typeface.BOLD, 1, mVariableLabelBuilder.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
 
         final TextPaint textPaint = new TextPaint();
-        textPaint.setTextSize(mCellSizeInPx / 1.3f);
+        textPaint.setTextSize(mCellSizeInPx / 1.4f);
         textPaint.setAntiAlias(true);
         mVariableLabelLayout = new DynamicLayout(mVariableLabelBuilder, textPaint, mCellSizeInPx, Layout.Alignment.ALIGN_CENTER, 1, 0, false);
         mMapLabelLayout = new DynamicLayout(mMapLabelBuilder, textPaint, mCellSizeInPx, Layout.Alignment.ALIGN_CENTER, 1, 0, false);

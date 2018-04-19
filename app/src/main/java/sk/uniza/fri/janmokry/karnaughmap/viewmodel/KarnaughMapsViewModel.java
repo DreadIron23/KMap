@@ -155,6 +155,10 @@ public class KarnaughMapsViewModel extends ProjectBaseViewModel<IKarnaughMapsVie
         processExpressionEditEventBufferIfNeeded();
     }
 
+    public void onActionExportProject() {
+        // TODO: resolve exporting
+    }
+
     private void processExpressionEditEventBufferIfNeeded() {
         if (mExpressionEditEventBuffer != null && getView() != null) {
             // apply changes

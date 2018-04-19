@@ -58,7 +58,7 @@ public class KMapView extends View {
         fireUpConfigurationComputing();
     };
 
-    private final int STROKE_WIDTH = 4;
+    private final int STROKE_WIDTH_IN_DP = 1;
 
     public KMapView(Context context, @NonNull KarnaughMapsFragment.OnKMapConfigurationComputationTriggerListener listener) {
         super(context);
@@ -88,17 +88,19 @@ public class KMapView extends View {
 
         mCellSizeInPx = GraphicsUtil.dpToPx(resources, CELL_SIZE_IN_DP);
 
-        mLinePaint.setColor(GraphicsUtil.fetchColor(mContext, R.attr.colorPrimary));
-        mLinePaint.setStrokeWidth(STROKE_WIDTH);
+        mLinePaint.setColor(getResources().getColor(R.color.lighterTextColor));
+        mLinePaint.setStrokeWidth(GraphicsUtil.dpToPx(getResources(), STROKE_WIDTH_IN_DP));
         mLinePaint.setStrokeJoin(Paint.Join.ROUND);
         mLinePaint.setStrokeCap(Paint.Cap.ROUND);
         mLinePaint.setAntiAlias(true);
 
-        mCellValuePaint.setTextSize(mCellSizeInPx / 1.3f);
+        mCellValuePaint.setTextSize(mCellSizeInPx / 1.4f);
         mCellValuePaint.setTextAlign(Paint.Align.CENTER);
+        mCellValuePaint.setColor(GraphicsUtil.fetchColor(getContext(), R.attr.colorPrimary));
         mCellValuePaint.setAntiAlias(true);
         mVariableTextPaint.setTextSize(mCellSizeInPx / 3f);
         mVariableTextPaint.setTextAlign(Paint.Align.CENTER);
+        mVariableTextPaint.setColor(GraphicsUtil.fetchColor(getContext(), R.attr.colorPrimary));
         mVariableTextPaint.setAntiAlias(true);
     }
 

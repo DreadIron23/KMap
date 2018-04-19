@@ -1,16 +1,19 @@
 package sk.uniza.fri.janmokry.karnaughmap.fragment;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import butterknife.BindView;
 import sk.uniza.fri.janmokry.karnaughmap.R;
+import sk.uniza.fri.janmokry.karnaughmap.activity.AdjustProjectActivity;
 import sk.uniza.fri.janmokry.karnaughmap.activity.ProjectBaseActivity;
 import sk.uniza.fri.janmokry.karnaughmap.adapter.ProjectViewPageAdapter;
 import sk.uniza.fri.janmokry.karnaughmap.data.ProjectInfo;
@@ -50,6 +53,8 @@ public class ProjectFragment extends ProjectBaseFragment<IProjectView, ProjectVi
     @BindView(R.id.pager_layout)
     protected LinearLayout mPagerLayout;
 
+    private ProjectInfo mProjectInfo;
+
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -65,6 +70,7 @@ public class ProjectFragment extends ProjectBaseFragment<IProjectView, ProjectVi
 
     @Override
     protected void init() {
+        setHasOptionsMenu(true);
 
         final ProjectBaseActivity projectBaseActivity = (ProjectBaseActivity) getActivity();
         projectBaseActivity.setSupportActionBar(mToolbar);
@@ -76,11 +82,28 @@ public class ProjectFragment extends ProjectBaseFragment<IProjectView, ProjectVi
             }
         }
 
-        final ProjectInfo projectInfo = (ProjectInfo) getArguments().getSerializable(ARG_PROJECT_INFO);
-        setTitle(projectInfo.name);
+        mProjectInfo = (ProjectInfo) getArguments().getSerializable(ARG_PROJECT_INFO);
+        setTitle(mProjectInfo.name);
     }
 
-    private void setTitle(String title) {
+    @Override
+    public void setTitle(String title) {
         mToolbarTitle.setText(title);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.edit:
+                onActionEdit();
+                return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void onActionEdit() {
+        final Intent intent = AdjustProjectActivity.newIntentForEditing(getContext(), mProjectInfo);
+        startActivity(intent);
     }
 }

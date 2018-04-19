@@ -7,6 +7,7 @@ import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -148,6 +149,7 @@ public class KarnaughMapsFragment extends ProjectBaseFragment<IKarnaughMapsView,
 
     @Override
     protected void init() {
+        setHasOptionsMenu(true);
         getProjectViewModel().mTruthTableCollection.observe(this, truthTableCollection -> {
 
             if (truthTableCollection != null) {
@@ -242,5 +244,16 @@ public class KarnaughMapsFragment extends ProjectBaseFragment<IKarnaughMapsView,
                 getViewModel().onKMapConfigurationComputationTrigger(kMap.getKMapCollection());
             }
         }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.export:
+                getViewModel().onActionExportProject();
+                return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 }
