@@ -3,6 +3,7 @@ package sk.uniza.fri.janmokry.karnaughmap.viewmodel;
 import android.arch.lifecycle.LifecycleOwner;
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.Observer;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -16,6 +17,7 @@ import java.util.List;
 import io.reactivex.Single;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
+import sk.uniza.fri.janmokry.karnaughmap.R;
 import sk.uniza.fri.janmokry.karnaughmap.algorithm.quinemccluskey.Quine;
 import sk.uniza.fri.janmokry.karnaughmap.algorithm.quinemccluskey.Solution;
 import sk.uniza.fri.janmokry.karnaughmap.data.EventBusService;
@@ -23,7 +25,10 @@ import sk.uniza.fri.janmokry.karnaughmap.data.event.KMapAdditionEvent;
 import sk.uniza.fri.janmokry.karnaughmap.data.event.KMapRemovalEvent;
 import sk.uniza.fri.janmokry.karnaughmap.data.event.LogicExpressionEditCompletionEvent;
 import sk.uniza.fri.janmokry.karnaughmap.data.event.TruthTableInvalidateEvent;
+import sk.uniza.fri.janmokry.karnaughmap.fragment.KarnaughMapsFragment;
 import sk.uniza.fri.janmokry.karnaughmap.kmap.KMapCollection;
+import sk.uniza.fri.janmokry.karnaughmap.kmap.TruthTableCollection;
+import sk.uniza.fri.janmokry.karnaughmap.util.ConversionUtil;
 import sk.uniza.fri.janmokry.karnaughmap.util.SL;
 import sk.uniza.fri.janmokry.karnaughmap.viewmodel.view.IKarnaughMapsView;
 
@@ -86,6 +91,8 @@ public class KarnaughMapsViewModel extends ProjectBaseViewModel<IKarnaughMapsVie
     /** Used when we receive event, we save it to this buffer for processing after save load from DB */
     @Nullable
     private LogicExpressionEditCompletionEvent mExpressionEditEventBuffer;
+    
+    private TruthTableCollection mTruthTableCollection;
 
 
     @Override
@@ -151,12 +158,34 @@ public class KarnaughMapsViewModel extends ProjectBaseViewModel<IKarnaughMapsVie
         mExpressionEditEventBuffer = event;
     }
 
-    public void onTruthTableCollectionUpdate() {
+    public void onTruthTableCollectionUpdate(TruthTableCollection truthTableCollection) {
+        mTruthTableCollection = truthTableCollection;
         processExpressionEditEventBufferIfNeeded();
     }
 
     public void onActionExportProject() {
-        // TODO: resolve exporting
+        if (mTruthTableCollection == null) {
+            return;
+        }
+        if (mTruthTableCollection.isEmpty()) {
+            if (getView() != null) {
+                final KarnaughMapsFragment fragment = (KarnaughMapsFragment) getView();
+                fragment.showToast(fragment.getResources().getString(R.string.project_screen_toast_can_not_export_project));
+                return;
+            }
+        }
+
+        final String shareString = ConversionUtil.buildStringForShare(mTruthTableCollection);
+
+        if (getView() != null) {
+            final KarnaughMapsFragment fragment = (KarnaughMapsFragment) getView();
+            final String shareTitle = fragment.getResources().getString(R.string.project_screen_share_title);
+            final Intent sharingIntent = new Intent(Intent.ACTION_SEND);
+            sharingIntent.setType("text/plain");
+            sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, shareTitle);
+            sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, shareString);
+            fragment.startActivity(Intent.createChooser(sharingIntent, shareTitle));
+        }
     }
 
     private void processExpressionEditEventBufferIfNeeded() {

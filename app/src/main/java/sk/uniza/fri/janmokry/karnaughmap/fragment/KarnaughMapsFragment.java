@@ -173,7 +173,7 @@ public class KarnaughMapsFragment extends ProjectBaseFragment<IKarnaughMapsView,
                 setNoDataMessageVisibility();
                 setAddKMapButtonVisibility();
 
-                getViewModel().onTruthTableCollectionUpdate();
+                getViewModel().onTruthTableCollectionUpdate(truthTableCollection);
             }
         });
     }

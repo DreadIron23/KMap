@@ -41,6 +41,8 @@
     <string name="project_screen_delete_dialog_discard">zrušiť</string>
     <string name="project_screen_toast_deleted_kmap">Mapa %s vymazaná\nMapy boli premenované podľa poradia</string>
     <string name="project_screen_computation_in_progress_message">prebieha výpočet…</string>
+    <string name="project_screen_toast_can_not_export_project">Nemožno exportovať prázdny projekt</string>
+    <string name="project_screen_share_title">KMAP zdieľaj projekt</string>
 
     <!-- Logic Expression Editor Screen -->
 

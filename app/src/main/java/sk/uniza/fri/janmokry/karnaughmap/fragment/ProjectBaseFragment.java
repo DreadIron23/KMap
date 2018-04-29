@@ -62,7 +62,7 @@ public abstract class ProjectBaseFragment<T extends IView, R extends AbstractVie
 
     protected abstract void init();
 
-    protected void showToast(String text) {
+    public void showToast(String text) {
         final Toast toast = Toast.makeText(getContext(), text, Toast.LENGTH_SHORT);
         final TextView textView = toast.getView().findViewById(android.R.id.message);
         if (textView != null) textView.setGravity(Gravity.CENTER_HORIZONTAL);
