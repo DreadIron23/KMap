@@ -57,7 +57,7 @@ public class ImplicantView extends android.support.v7.widget.AppCompatTextView {
         mEditor = new ImplicantEditor(implicant);
 
         updateText();
-        setBackground(context.getResources().getDrawable(R.drawable.implicant_view_background));
+        setBackgroundDrawable(context.getResources().getDrawable(R.drawable.implicant_view_background));
         final int padding = GraphicsUtil.dpToPx(getResources(), 2);
         setPadding(padding * 2, padding, padding * 3, padding);
         setTextSize(TypedValue.COMPLEX_UNIT_DIP, 16);
@@ -115,26 +115,28 @@ public class ImplicantView extends android.support.v7.widget.AppCompatTextView {
     }
 
     public void animateShowcase(long delay) {
-        mHandler.postDelayed(() -> {
-            final ViewPropertyAnimator animate = animate();
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                animate.translationZ(GraphicsUtil.dpToPx(getResources(), 6));
-            }
-            animate.scaleX(1.1f)
-                    .scaleY(1.1f)
-                    .setDuration(SHOWCASE_IMPLICANT_ANIMATION_DURATION)
-                    .withEndAction(() -> {
-                        final ViewPropertyAnimator animateBack = animate();
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                            animateBack.translationZ(GraphicsUtil.dpToPx(getResources(), 0));
-                        }
-                        animateBack.setDuration(SHOWCASE_IMPLICANT_ANIMATION_DURATION)
-                                .scaleX(1)
-                                .scaleY(1)
-                                .start();
-                    })
-                    .start();
-        }, delay);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+            mHandler.postDelayed(() -> {
+                final ViewPropertyAnimator animate = animate();
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    animate.translationZ(GraphicsUtil.dpToPx(getResources(), 6));
+                }
+                animate.scaleX(1.1f)
+                        .scaleY(1.1f)
+                        .setDuration(SHOWCASE_IMPLICANT_ANIMATION_DURATION)
+                        .withEndAction(() -> {
+                            final ViewPropertyAnimator animateBack = animate();
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                                animateBack.translationZ(GraphicsUtil.dpToPx(getResources(), 0));
+                            }
+                            animateBack.setDuration(SHOWCASE_IMPLICANT_ANIMATION_DURATION)
+                                    .scaleX(1)
+                                    .scaleY(1)
+                                    .start();
+                        })
+                        .start();
+            }, delay);
+        }
     }
 
     private void updateText() {

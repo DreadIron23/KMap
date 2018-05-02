@@ -76,7 +76,7 @@ public class LogicExpressionPickerItemView extends FrameLayout {
     public void select() {
         mIsSelected = true;
         mTextView.setTextColor(mSelectTextColor);
-        mTextView.setBackground(mSelectBackgroundColor);
+        mTextView.setBackgroundDrawable(mSelectBackgroundColor);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             mTextView.setZ(0f);
         }
@@ -85,7 +85,7 @@ public class LogicExpressionPickerItemView extends FrameLayout {
     public void unselect() {
         mIsSelected = false;
         mTextView.setTextColor(mUnselectTextColor);
-        mTextView.setBackground(mUnselectBackgroundColor);
+        mTextView.setBackgroundDrawable(mUnselectBackgroundColor);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             mTextView.setZ(2f);
         }
